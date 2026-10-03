@@ -1,0 +1,191 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Explore Careers | CareerPath</title>
+
+    <link rel="stylesheet" href="{% static 'css/explore_careers.css' %}">
+
+</head>
+
+<body>
+
+
+    <!-- ================= NAVBAR ================= -->
+
+    <header>
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                🎓
+            </div>
+
+            CareerPath
+
+        </div>
+
+
+        <nav>
+
+            <a href="/">
+                Home
+            </a>
+
+            <a href="/explore_careers/" class="active">
+                Explore Careers
+            </a>
+
+            <a href="/work/">
+                How It Works
+            </a>
+
+            <a href="/about/">
+                About Us
+            </a>
+
+        </nav>
+
+    </header>
+
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main>
+
+        <section class="career-section">
+
+
+            <!-- ================= HEADING ================= -->
+
+            <div class="page-heading">
+
+                <div class="top-label">
+                    💼 Explore Your Future
+                </div>
+
+                <h1>
+                    Explore <span>Career Options</span>
+                </h1>
+
+                <p>
+                    Discover different career paths, understand what
+                    each career involves and find the right direction
+                    for your future.
+                </p>
+
+            </div>
+
+
+
+            <!-- ================= CAREER GRID ================= -->
+
+            <div class="career-grid">
+
+
+                {% for career in careers %}
+
+                <div class="career-card">
+
+
+                    <!-- CAREER ICON -->
+
+                    <div class="career-icon">
+                        {{ career.icon }}
+                    </div>
+
+
+                    <!-- CAREER CATEGORY -->
+
+                    <span class="career-category">
+                        {{ career.category }}
+                    </span>
+
+
+                    <!-- CAREER NAME -->
+
+                    <h2>
+                        {{ career.name }}
+                    </h2>
+
+
+                    <!-- CAREER DESCRIPTION -->
+
+                    <p>
+                        {{ career.description }}
+                    </p>
+
+
+                    <!-- CAREER DETAILS BUTTON -->
+
+                    <a href="/career_details/{{ career.name|slugify }}/"
+                       class="details-btn">
+
+                        View Career Details →
+
+                    </a>
+
+
+                </div>
+
+                {% endfor %}
+
+
+            </div>
+
+
+
+            <!-- ================= BOTTOM CTA ================= -->
+
+            <div class="career-cta">
+
+                <div>
+
+                    <h2>
+                        Not sure which career is right for you?
+                    </h2>
+
+                    <p>
+                        Take our career assessment and get personalized
+                        career recommendations based on your interests
+                        and strengths.
+                    </p>
+
+                </div>
+
+
+                <a href="/career_assessment/" class="assessment-btn">
+                    Take Assessment →
+                </a>
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <p>
+            © 2026 CareerPath. Build your future with confidence.
+        </p>
+
+    </footer>
+
+
+</body>
+
+</html>

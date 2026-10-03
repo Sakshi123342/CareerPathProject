@@ -1,0 +1,475 @@
+
+/* ==============================
+   CareerPath - Career Roadmap CSS
+   ============================== */
+
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f7f6ff;
+    color: #25213b;
+    line-height: 1.6;
+}
+
+/* Navbar */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 25px;
+    padding: 20px 8%;
+    background: #ffffff;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: bold;
+    color: #6c4ce3;
+    white-space: nowrap;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 28px;
+}
+
+nav a {
+    text-decoration: none;
+    color: #49445e;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+
+nav a:hover {
+    color: #6c4ce3;
+}
+
+/* Main */
+main {
+    padding: 55px 8%;
+}
+
+.roadmap-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Top label */
+.top-label {
+    display: inline-block;
+    background: #ece7ff;
+    color: #6844d6;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-weight: bold;
+    margin-bottom: 25px;
+}
+
+/* Hero */
+.roadmap-hero {
+    text-align: center;
+    background: linear-gradient(135deg, #7655e8, #9a78f5);
+    color: #ffffff;
+    padding: 65px 25px;
+    border-radius: 25px;
+    box-shadow: 0 15px 35px rgba(108, 76, 227, 0.2);
+}
+
+.career-icon {
+    font-size: 50px;
+    margin-bottom: 15px;
+}
+
+.roadmap-hero span {
+    font-size: 15px;
+    opacity: 0.9;
+}
+
+.roadmap-hero h1 {
+    font-size: 40px;
+    line-height: 1.25;
+    margin: 15px 0;
+    overflow-wrap: anywhere;
+}
+
+.roadmap-hero p {
+    max-width: 650px;
+    margin: 0 auto;
+    line-height: 1.7;
+    font-size: 17px;
+}
+
+/* Roadmap section */
+.roadmap-content {
+    margin-top: 55px;
+}
+
+.roadmap-content h2 {
+    font-size: 30px;
+    line-height: 1.3;
+    margin-bottom: 12px;
+}
+
+.roadmap-content > p {
+    color: #777187;
+    line-height: 1.7;
+    margin-bottom: 30px;
+}
+
+/* Roadmap grid */
+.roadmap-steps {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+    align-items: start;
+}
+
+/* Individual card */
+.roadmap-card {
+    min-width: 0;
+    background: #ffffff;
+    border: 1px solid #e8e3fa;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(45, 35, 90, 0.06);
+    transition: box-shadow 0.3s ease;
+}
+
+.roadmap-card:hover {
+    box-shadow: 0 14px 30px rgba(45, 35, 90, 0.12);
+}
+
+/* Clickable card heading */
+.roadmap-toggle {
+    width: 100%;
+    min-height: 105px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 22px;
+    border: none;
+    background: #ffffff;
+    color: #25213b;
+    text-align: left;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.roadmap-toggle:hover {
+    background: #faf9ff;
+}
+
+.roadmap-toggle:focus-visible {
+    outline: 3px solid #9a78f5;
+    outline-offset: -4px;
+}
+
+/* Step number */
+.roadmap-toggle .step-number {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    border-radius: 14px;
+    background: #eee9ff;
+    color: #6c4ce3;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Stage title and duration */
+.stage-heading {
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.stage-heading strong {
+    font-size: 20px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.stage-heading small {
+    color: #777187;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* Plus / minus icon */
+.toggle-icon {
+    flex-shrink: 0;
+    width: 30px;
+    text-align: center;
+    font-size: 25px;
+    line-height: 1;
+    font-weight: normal;
+    color: #6c4ce3;
+}
+
+/* Expanded card content */
+.stage-details {
+    padding: 8px 25px 25px;
+    border-top: 1px solid #eee9ff;
+    background: #ffffff;
+    overflow-wrap: anywhere;
+}
+
+.stage-details h4 {
+    margin: 18px 0 8px;
+    color: #6844d6;
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+.stage-details p {
+    color: #777187;
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+.stage-details ul {
+    padding-left: 22px;
+    margin-bottom: 12px;
+}
+
+.stage-details li {
+    color: #777187;
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 5px;
+}
+
+/* Ensure collapsed content stays hidden */
+.stage-details[hidden] {
+    display: none !important;
+}
+
+/* Error message */
+.error-message {
+    color: #b42318;
+    background: #fff1f0;
+    border: 1px solid #ffd5d2;
+    border-radius: 12px;
+    padding: 15px 20px;
+    margin: 20px 0;
+}
+
+/* CTA section */
+.roadmap-cta {
+    margin-top: 55px;
+    padding: 40px 25px;
+    background: #ffffff;
+    border: 1px solid #e8e3fa;
+    border-radius: 22px;
+    text-align: center;
+}
+
+.roadmap-cta h2 {
+    font-size: 28px;
+    line-height: 1.3;
+    margin-bottom: 12px;
+}
+
+.roadmap-cta p {
+    color: #777187;
+    margin-bottom: 25px;
+}
+
+/* Buttons */
+.cta-btn,
+.back-btn {
+    display: inline-block;
+    text-decoration: none;
+    padding: 14px 25px;
+    border-radius: 10px;
+    font-weight: bold;
+    transition: background 0.3s, transform 0.3s;
+}
+
+.cta-btn {
+    background: #6c4ce3;
+    color: #ffffff;
+}
+
+.cta-btn:hover {
+    background: #5435c4;
+    transform: translateY(-2px);
+}
+
+/* Back button */
+.back-section {
+    text-align: center;
+    margin-top: 35px;
+}
+
+.back-btn {
+    color: #6c4ce3;
+    background: #ece7ff;
+}
+
+.back-btn:hover {
+    background: #ded5ff;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 25px;
+    background: #ffffff;
+    color: #777187;
+    margin-top: 40px;
+}
+
+/* ==============================
+   Tablet
+   ============================== */
+@media (max-width: 1000px) {
+    header {
+        padding: 20px 5%;
+    }
+
+    main {
+        padding: 45px 5%;
+    }
+
+    .roadmap-steps {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+    }
+}
+
+/* ==============================
+   Mobile
+   ============================== */
+@media (max-width: 650px) {
+    header {
+        flex-direction: column;
+        gap: 18px;
+        padding: 20px 5%;
+    }
+
+    nav {
+        justify-content: center;
+        gap: 15px 20px;
+    }
+
+    nav a {
+        font-size: 14px;
+    }
+
+    main {
+        padding: 30px 5%;
+    }
+
+    .top-label {
+        font-size: 13px;
+        padding: 9px 16px;
+        margin-bottom: 20px;
+    }
+
+    .roadmap-hero {
+        padding: 45px 20px;
+        border-radius: 20px;
+    }
+
+    .career-icon {
+        font-size: 42px;
+    }
+
+    .roadmap-hero h1 {
+        font-size: 30px;
+    }
+
+    .roadmap-hero p {
+        font-size: 15px;
+    }
+
+    .roadmap-content {
+        margin-top: 40px;
+    }
+
+    .roadmap-content h2 {
+        font-size: 25px;
+    }
+
+    .roadmap-steps {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .roadmap-toggle {
+        min-height: 90px;
+        padding: 18px;
+        gap: 12px;
+    }
+
+    .roadmap-toggle .step-number {
+        width: 42px;
+        height: 42px;
+        font-size: 16px;
+        border-radius: 12px;
+    }
+
+    .stage-heading strong {
+        font-size: 18px;
+    }
+
+    .stage-details {
+        padding: 5px 20px 22px;
+    }
+
+    .roadmap-cta {
+        margin-top: 40px;
+        padding: 30px 20px;
+    }
+
+    .roadmap-cta h2 {
+        font-size: 24px;
+    }
+
+    .cta-btn,
+    .back-btn {
+        padding: 12px 18px;
+        font-size: 14px;
+    }
+}
+
+/* Small mobile */
+@media (max-width: 380px) {
+    .roadmap-toggle {
+        gap: 9px;
+        padding: 15px;
+    }
+
+    .roadmap-toggle .step-number {
+        width: 38px;
+        height: 38px;
+        font-size: 14px;
+    }
+
+    .stage-heading strong {
+        font-size: 16px;
+    }
+
+    .toggle-icon {
+        width: 22px;
+        font-size: 22px;
+    }
+}

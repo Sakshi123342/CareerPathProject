@@ -1,0 +1,574 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Profile Analysis</title>
+
+    <link rel="stylesheet"
+          href="{% static 'css/job_internship_analysis.css' %}">
+
+</head>
+
+
+<body>
+
+    <div class="page-wrapper">
+
+        <!-- HEADER -->
+
+        <header class="page-header">
+
+            <div class="header-content">
+
+                <p class="header-label">
+                    CAREERPATH
+                </p>
+
+                <h1>
+                    🤖 Profile Analysis
+                </h1>
+
+                <p class="header-subtitle">
+                    Analyze your profile based on your education,
+                    selected interest and entered skills.
+                </p>
+
+            </div>
+
+        </header>
+
+
+        <!-- MAIN -->
+
+        <main class="main-container">
+
+            <section class="analysis-card">
+
+                <div class="section-icon">
+                    🔍
+                </div>
+
+
+                <h2>
+                    Analyzing Your Profile
+                </h2>
+
+
+                <p class="analysis-text">
+                    Your profile will be analyzed using your actual
+                    profile information and the details you entered.
+                </p>
+
+
+                <!-- INTEREST -->
+
+                <div class="interest-display">
+
+                    <span class="interest-label">
+                        Selected Interest
+                    </span>
+
+                    <strong id="selectedInterest">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <!-- SKILLS -->
+
+                <div class="interest-display skills-display">
+
+                    <span class="interest-label">
+                        Entered Skills
+                    </span>
+
+                    <strong id="selectedSkills">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <!-- EDUCATION -->
+
+                <div class="interest-display">
+
+                    <span class="interest-label">
+                        Education
+                    </span>
+
+                    <strong id="selectedEducation">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <!-- ANALYZE BUTTON -->
+
+                <div class="analysis-button-container">
+
+                    <button
+                        type="button"
+                        id="analyzeProfileButton"
+                        class="analyze-button">
+
+                        Analyze My Profile →
+
+                    </button>
+
+                </div>
+
+
+                <!-- ANALYSIS RESULT -->
+
+                <div
+                    id="analysisResult"
+                    class="analysis-result"
+                    style="display: none;">
+
+
+                    <!-- PROFILE SUMMARY -->
+
+                    <div class="result-box">
+
+                        <h3>
+                            Profile Summary
+                        </h3>
+
+                        <p id="profileSummary"></p>
+
+                    </div>
+
+
+                    <!-- INTEREST ALIGNMENT -->
+
+                    <div class="result-box">
+
+                        <h3>
+                            Interest Alignment
+                        </h3>
+
+                        <p id="interestAlignment"></p>
+
+                    </div>
+
+
+                    <!-- MATCHING SKILLS + SKILL GAPS -->
+
+                    <div class="result-grid">
+
+                        <div class="result-box">
+
+                            <h3>
+                                Matching Skills
+                            </h3>
+
+                            <ul id="matchingSkills"></ul>
+
+                        </div>
+
+
+                        <div class="result-box">
+
+                            <h3>
+                                Skill Gaps
+                            </h3>
+
+                            <ul id="skillGaps"></ul>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- CAREER FOCUS -->
+
+                    <div class="result-box">
+
+                        <h3>
+                            Career Focus
+                        </h3>
+
+                        <ul id="careerFocus"></ul>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- BACK -->
+
+            <div class="back-container">
+
+                <a
+                    href="{% url 'job_internship_recommendation' %}"
+                    class="back-button">
+
+                    ← Back
+
+                </a>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <!-- JAVASCRIPT -->
+
+    <script>
+
+        // =====================================================
+        // DATA FROM PREVIOUS PAGE
+        // =====================================================
+
+        const selectedInterest =
+            sessionStorage.getItem(
+                "job_internship_interest"
+            );
+
+
+        const selectedSkills =
+            sessionStorage.getItem(
+                "job_internship_skills"
+            );
+
+
+        const selectedEducation =
+            sessionStorage.getItem(
+                "job_internship_education"
+            );
+
+
+        // =====================================================
+        // ELEMENTS
+        // =====================================================
+
+        const interestElement =
+            document.getElementById(
+                "selectedInterest"
+            );
+
+
+        const skillsElement =
+            document.getElementById(
+                "selectedSkills"
+            );
+
+
+        const educationElement =
+            document.getElementById(
+                "selectedEducation"
+            );
+
+
+        const analyzeProfileButton =
+            document.getElementById(
+                "analyzeProfileButton"
+            );
+
+
+        const analysisResult =
+            document.getElementById(
+                "analysisResult"
+            );
+
+
+        // =====================================================
+        // DISPLAY USER INPUT
+        // =====================================================
+
+        interestElement.textContent =
+            selectedInterest ||
+            "Interest not selected";
+
+
+        skillsElement.textContent =
+            selectedSkills ||
+            "Skills not entered";
+
+
+        educationElement.textContent =
+            selectedEducation ||
+            "Education not provided";
+
+
+        // =====================================================
+        // ANALYZE PROFILE
+        // =====================================================
+
+        analyzeProfileButton.addEventListener(
+            "click",
+            async function () {
+
+                analyzeProfileButton.textContent =
+                    "Analyzing...";
+
+
+                analyzeProfileButton.disabled =
+                    true;
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            "{% url 'job_internship_analysis_api' %}",
+                            {
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+
+                                body: JSON.stringify({
+
+                                    education:
+                                        selectedEducation,
+
+                                    interest:
+                                        selectedInterest,
+
+                                    skills:
+                                        selectedSkills
+
+                                })
+
+                            }
+                        );
+
+
+                    const data =
+                        await response.json();
+
+
+                    // =================================================
+                    // ERROR CHECK
+                    // =================================================
+
+                    if (
+                        !response.ok ||
+                        !data.success
+                    ) {
+
+                        throw new Error(
+                            data.error ||
+                            "Profile analysis failed."
+                        );
+
+                    }
+
+
+                    // =================================================
+                    // PROFILE SUMMARY
+                    // =================================================
+
+                    document.getElementById(
+                        "profileSummary"
+                    ).textContent =
+                        data.profile_summary;
+
+
+                    // =================================================
+                    // INTEREST ALIGNMENT
+                    // =================================================
+
+                    document.getElementById(
+                        "interestAlignment"
+                    ).textContent =
+                        data.interest_alignment;
+
+
+                    // =================================================
+                    // MATCHING SKILLS
+                    // =================================================
+
+                    const matchingSkills =
+                        document.getElementById(
+                            "matchingSkills"
+                        );
+
+
+                    matchingSkills.innerHTML =
+                        "";
+
+
+                    if (
+                        Array.isArray(
+                            data.matching_skills
+                        )
+                    ) {
+
+                        data.matching_skills.forEach(
+                            function (skill) {
+
+                                const li =
+                                    document.createElement(
+                                        "li"
+                                    );
+
+
+                                li.textContent =
+                                    skill;
+
+
+                                matchingSkills.appendChild(
+                                    li
+                                );
+
+                            }
+                        );
+
+                    }
+
+
+                    // =================================================
+                    // SKILL GAPS
+                    // =================================================
+
+                    const skillGaps =
+                        document.getElementById(
+                            "skillGaps"
+                        );
+
+
+                    skillGaps.innerHTML =
+                        "";
+
+
+                    if (
+                        Array.isArray(
+                            data.skill_gaps
+                        )
+                    ) {
+
+                        data.skill_gaps.forEach(
+                            function (skill) {
+
+                                const li =
+                                    document.createElement(
+                                        "li"
+                                    );
+
+
+                                li.textContent =
+                                    skill;
+
+
+                                skillGaps.appendChild(
+                                    li
+                                );
+
+                            }
+                        );
+
+                    }
+
+
+                    // =================================================
+                    // CAREER FOCUS
+                    // =================================================
+
+                    const careerFocus =
+                        document.getElementById(
+                            "careerFocus"
+                        );
+
+
+                    careerFocus.innerHTML =
+                        "";
+
+
+                    if (
+                        Array.isArray(
+                            data.career_focus
+                        )
+                    ) {
+
+                        data.career_focus.forEach(
+                            function (career) {
+
+                                const li =
+                                    document.createElement(
+                                        "li"
+                                    );
+
+
+                                li.textContent =
+                                    career;
+
+
+                                careerFocus.appendChild(
+                                    li
+                                );
+
+                            }
+                        );
+
+                    }
+
+
+                    // =================================================
+                    // SHOW RESULT
+                    // =================================================
+
+                    analysisResult.style.display =
+                        "block";
+
+
+                    analyzeProfileButton.textContent =
+                        "Profile Analyzed ✓";
+
+                }
+
+
+                catch (error) {
+
+                    console.error(
+                        "Analysis Error:",
+                        error
+                    );
+
+
+                    alert(
+                        error.message
+                    );
+
+
+                    analyzeProfileButton.textContent =
+                        "Analyze My Profile →";
+
+
+                    analyzeProfileButton.disabled =
+                        false;
+
+                }
+
+            }
+
+        );
+
+    </script>
+
+</body>
+
+</html>
+
+

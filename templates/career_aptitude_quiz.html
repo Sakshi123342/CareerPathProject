@@ -1,0 +1,2462 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Career Aptitude Quiz</title>
+
+    <link rel="stylesheet"
+          href="{% static 'css/career_aptitude_quiz.css' %}">
+
+
+    <!-- ================================================= -->
+    <!-- RESULT SPACING -->
+    <!-- ================================================= -->
+
+    <style>
+
+        .interest-result {
+            margin-top: 25px;
+            margin-bottom: 35px;
+        }
+
+
+        .overall-result {
+            margin-bottom: 35px;
+        }
+
+
+        .performance-message {
+            margin-top: 25px;
+            margin-bottom: 45px;
+        }
+
+
+        .ai-result-section {
+            margin-top: 20px;
+        }
+
+
+        .ai-result-block {
+            margin-bottom: 40px;
+        }
+
+
+        .ai-result-block h3 {
+            margin-bottom: 15px;
+        }
+
+
+        .ai-result-block p {
+            line-height: 1.8;
+        }
+
+
+        .question-results {
+            margin-top: 20px;
+        }
+
+
+        .question-result-item {
+            margin-bottom: 25px;
+            padding: 18px;
+        }
+
+
+        .question-result-item strong {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+
+        .question-result-item small {
+            display: block;
+            margin-top: 7px;
+            line-height: 1.6;
+        }
+
+
+        #strengthsResult div,
+        #interestsResult div,
+        #careerAreasResult div {
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+
+        .result-actions {
+            margin-top: 40px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="quiz-page">
+
+
+    <!-- ================================================= -->
+    <!-- ================= QUIZ CONTAINER ================= -->
+    <!-- ================================================= -->
+
+    <div class="quiz-container">
+
+
+        <!-- ================================================= -->
+        <!-- ================= HEADER ========================= -->
+        <!-- ================================================= -->
+
+        <div class="quiz-header">
+
+            <div>
+
+                <h1>
+                    Career Aptitude Quiz
+                </h1>
+
+                <p>
+                    Answer the questions to discover your
+                    strengths, interests and suitable career areas.
+                </p>
+
+            </div>
+
+
+            <div class="question-count">
+
+                Question
+
+                <span id="questionNumber">
+                    1
+                </span>
+
+                /
+
+                <span id="totalQuestions">
+                    --
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- ================= PROGRESS ======================= -->
+        <!-- ================================================= -->
+
+        <div class="progress-container">
+
+            <div
+                class="progress-bar"
+                id="progressBar">
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- ============== INTEREST SECTION ================== -->
+        <!-- ================================================= -->
+
+        <div
+            id="interestSection"
+            class="interest-section">
+
+
+            <h2>
+                Tell Us About Your Interest
+            </h2>
+
+
+            <p class="interest-description">
+
+                Enter your subject, field, or area of interest
+                to start your personalized quiz.
+
+            </p>
+
+
+            <input
+                type="text"
+                id="interestInput"
+                class="interest-input"
+                placeholder="e.g. Python, AI, Web Development"
+                autocomplete="off">
+
+
+            <button
+                type="button"
+                id="startQuizButton"
+                class="start-quiz-button"
+                onclick="startQuiz()">
+
+                Start Quiz →
+
+            </button>
+
+
+            <p
+                id="interestError"
+                class="interest-error">
+            </p>
+
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- ================= LOADING ======================== -->
+        <!-- ================================================= -->
+
+        <div
+            id="loadingBox"
+            class="loading-box"
+            style="display: none;">
+
+
+            <div class="loader">
+            </div>
+
+
+            <p id="loadingMessage">
+
+                Preparing your personalized aptitude quiz...
+
+            </p>
+
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- ================= QUIZ CONTENT =================== -->
+        <!-- ================================================= -->
+
+        <div
+            id="quizContent"
+            class="quiz-content"
+            style="display: none;">
+
+
+            <!-- ================= QUESTION ================= -->
+
+            <h2 id="questionText">
+
+                Question will appear here.
+
+            </h2>
+
+
+            <!-- ================= OPTIONS ================= -->
+
+            <div
+                id="optionsContainer"
+                class="options-container">
+
+            </div>
+
+
+            <!-- ================= ERROR ================= -->
+
+            <p
+                id="quizError"
+                class="quiz-error">
+
+            </p>
+
+
+            <!-- ================= NAVIGATION ================= -->
+
+            <div class="navigation-buttons">
+
+
+                <!-- PREVIOUS -->
+
+                <button
+                    type="button"
+                    id="previousButton"
+                    class="quiz-nav-button previous-button"
+                    onclick="previousQuestion()"
+                    disabled>
+
+                    ← Previous
+
+                </button>
+
+
+                <!-- NEXT -->
+
+                <button
+                    type="button"
+                    id="nextButton"
+                    class="quiz-nav-button next-button"
+                    onclick="nextQuestion()"
+                    disabled>
+
+                    Next →
+
+                </button>
+
+
+            </div>
+
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- ================= RESULT ========================= -->
+        <!-- ================================================= -->
+
+        <div
+            id="resultBox"
+            class="result-box"
+            style="display: none;">
+
+
+            <!-- ================= RESULT ICON ================= -->
+
+            <div class="result-icon">
+
+                ✓
+
+            </div>
+
+
+            <!-- ================= RESULT TITLE ================ -->
+
+            <h2>
+
+                Career Aptitude Result
+
+            </h2>
+
+
+            <!-- ================= RESULT DESCRIPTION ========= -->
+
+            <p id="resultText"
+               style="margin-bottom: 30px;">
+
+                Your aptitude quiz has been completed
+                based on your selected subject.
+
+            </p>
+
+
+            <!-- ================================================= -->
+            <!-- ================= INTEREST AREA ================== -->
+            <!-- ================================================= -->
+
+            <div class="interest-result">
+
+
+                <strong>
+
+                    Interest Area:
+
+                </strong>
+
+
+                <span id="resultInterest">
+
+                    -
+
+                </span>
+
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- ================= OVERALL SCORE ================= -->
+            <!-- ================================================= -->
+
+            <div class="overall-result">
+
+
+                <!-- OVERALL SCORE -->
+
+                <div class="score-item">
+
+
+                    <span class="score-label">
+
+                        Overall Score
+
+                    </span>
+
+
+                    <span
+                        id="scoreValue"
+                        class="score-value">
+
+                        0 / 0
+
+                    </span>
+
+
+                </div>
+
+
+                <!-- PERCENTAGE -->
+
+                <div class="score-item">
+
+
+                    <span class="score-label">
+
+                        Percentage
+
+                    </span>
+
+
+                    <span
+                        id="percentageValue"
+                        class="score-value">
+
+                        0%
+
+                    </span>
+
+
+                </div>
+
+
+                <!-- TOTAL QUESTIONS -->
+
+                <div class="score-item">
+
+
+                    <span class="score-label">
+
+                        Total Questions
+
+                    </span>
+
+
+                    <span
+                        id="totalQuestionsResult"
+                        class="score-value">
+
+                        0
+
+                    </span>
+
+
+                </div>
+
+
+                <!-- CORRECT -->
+
+                <div class="score-item">
+
+
+                    <span class="score-label">
+
+                        Correct Answers
+
+                    </span>
+
+
+                    <span
+                        id="correctValue"
+                        class="score-value">
+
+                        0
+
+                    </span>
+
+
+                </div>
+
+
+                <!-- WRONG -->
+
+                <div class="score-item">
+
+
+                    <span class="score-label">
+
+                        Wrong Answers
+
+                    </span>
+
+
+                    <span
+                        id="wrongValue"
+                        class="score-value">
+
+                        0
+
+                    </span>
+
+
+                </div>
+
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- ================= PERFORMANCE ==================== -->
+            <!-- ================================================= -->
+
+            <div
+                id="performanceMessage"
+                class="performance-message">
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- ================= AI ANALYSIS ==================== -->
+            <!-- ================================================= -->
+
+            <div class="ai-result-section">
+
+
+                <!-- ================= OVERALL RESULT ============== -->
+
+                <div class="ai-result-block">
+
+
+                    <h3>
+
+                        Overall Result
+
+                    </h3>
+
+
+                    <p id="overallResult">
+
+                        -
+
+                    </p>
+
+
+                </div>
+
+
+                <!-- ================= STRENGTHS =================== -->
+
+                <div class="ai-result-block">
+
+
+                    <h3>
+
+                        Your Strengths
+
+                    </h3>
+
+
+                    <div id="strengthsResult">
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- ================= INTERESTS =================== -->
+
+                <div class="ai-result-block">
+
+
+                    <h3>
+
+                        Your Interests
+
+                    </h3>
+
+
+                    <div id="interestsResult">
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- ================= CAREER AREAS ================ -->
+
+                <div class="ai-result-block">
+
+
+                    <h3>
+
+                        Suitable Career Areas
+
+                    </h3>
+
+
+                    <div id="careerAreasResult">
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- ================= ANALYSIS ==================== -->
+
+                <div class="ai-result-block">
+
+
+                    <h3>
+
+                        Overall Analysis
+
+                    </h3>
+
+
+                    <p id="analysisResult">
+
+                        -
+
+                    </p>
+
+
+                </div>
+
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- ================= QUESTION RESULT ================= -->
+            <!-- ================================================= -->
+
+            <div
+                class="ai-result-block"
+                style="margin-top: 10px;">
+
+
+                <h3>
+
+                    Question-wise Result
+
+                </h3>
+
+
+                <div
+                    id="questionResults"
+                    class="question-results">
+
+                </div>
+
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- ================= RESULT ACTION ================== -->
+            <!-- ================================================= -->
+
+            <div class="result-actions">
+
+
+                <button
+                    type="button"
+                    class="restart-button"
+                    onclick="restartQuiz()">
+
+                    Take Quiz Again
+
+                </button>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- ================= BACK BUTTON ==================== -->
+    <!-- ================================================= -->
+
+    <div class="back-button-container">
+
+
+        <a
+            href="/#features"
+            class="back-button">
+
+            ← Back to Features
+
+        </a>
+
+
+    </div>
+
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- ======================== JAVASCRIPT ===================== -->
+<!-- ========================================================= -->
+
+<script>
+
+
+/* =========================================================
+   GLOBAL VARIABLES
+========================================================= */
+
+let questions = [];
+
+let currentQuestionIndex = 0;
+
+let answers = [];
+
+let selectedAnswer = null;
+
+let quizLoaded = false;
+
+let quizFinished = false;
+
+let userInterest = "";
+
+
+/* =========================================================
+   PAGE LOAD
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        showLoading(false);
+
+    }
+);
+
+
+/* =========================================================
+   START QUIZ
+========================================================= */
+
+async function startQuiz() {
+
+
+    const input =
+        document.getElementById(
+            "interestInput"
+        );
+
+
+    const error =
+        document.getElementById(
+            "interestError"
+        );
+
+
+    userInterest =
+        input.value.trim();
+
+
+    /* ================= VALIDATION ================= */
+
+    if (!userInterest) {
+
+        error.textContent =
+            "Please enter your subject, field, or interest.";
+
+        input.focus();
+
+        return;
+
+    }
+
+
+    /* ================= RESET ================= */
+
+    error.textContent = "";
+
+    questions = [];
+
+    answers = [];
+
+    currentQuestionIndex = 0;
+
+    selectedAnswer = null;
+
+    quizLoaded = false;
+
+    quizFinished = false;
+
+
+    /* ================= HIDE RESULT ================= */
+
+    document.getElementById(
+        "resultBox"
+    ).style.display =
+        "none";
+
+
+    /* ================= HIDE INTEREST ================= */
+
+    document.getElementById(
+        "interestSection"
+    ).style.display =
+        "none";
+
+
+    /* ================= LOAD QUIZ ================= */
+
+    await loadQuiz();
+
+}
+
+
+/* =========================================================
+   LOAD QUIZ
+========================================================= */
+
+async function loadQuiz() {
+
+
+    showLoading(
+        true,
+        "Preparing your personalized aptitude quiz..."
+    );
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                "{% url 'career_aptitude_api' %}",
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+
+                    body:
+                        JSON.stringify({
+
+                            action:
+                                "generate",
+
+                            subject:
+                                userInterest,
+
+                            interest:
+                                userInterest
+
+                        })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        /* ================= LOGIN ================= */
+
+        if (
+            response.status === 401
+        ) {
+
+
+            if (
+                data.redirect_url
+            ) {
+
+                window.location.href =
+                    data.redirect_url;
+
+                return;
+
+            }
+
+        }
+
+
+        /* ================= API ERROR ================= */
+
+        if (
+            !response.ok
+        ) {
+
+            throw new Error(
+                data.error ||
+                "Unable to load the aptitude quiz."
+            );
+
+        }
+
+
+        /* ================= VALIDATE QUESTIONS ================= */
+
+        if (
+            !Array.isArray(
+                data.questions
+            )
+            ||
+            data.questions.length === 0
+        ) {
+
+            throw new Error(
+                "No aptitude questions received."
+            );
+
+        }
+
+
+        /* =================================================
+           USE MAXIMUM 10 QUESTIONS
+        ================================================= */
+
+        questions =
+            data.questions.slice(
+                0,
+                10
+            );
+
+
+        /* ================= RESET ANSWERS ================= */
+
+        answers =
+            new Array(
+                questions.length
+            ).fill(null);
+
+
+        currentQuestionIndex = 0;
+
+        selectedAnswer = null;
+
+        quizLoaded = true;
+
+        quizFinished = false;
+
+
+        /* ================= TOTAL QUESTIONS ================= */
+
+        document.getElementById(
+            "totalQuestions"
+        ).textContent =
+            questions.length;
+
+
+        /* ================= SHOW QUIZ ================= */
+
+        document.getElementById(
+            "quizContent"
+        ).style.display =
+            "block";
+
+
+        /* ================= CLEAR ERROR ================= */
+
+        document.getElementById(
+            "quizError"
+        ).textContent =
+            "";
+
+
+        /* ================= SHOW QUESTION ================= */
+
+        showQuestion();
+
+
+    }
+
+
+    catch (error) {
+
+
+        console.error(
+            "Career Aptitude Quiz Error:",
+            error
+        );
+
+
+        document.getElementById(
+            "interestSection"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "interestError"
+        ).textContent =
+            error.message;
+
+
+    }
+
+
+    finally {
+
+        showLoading(false);
+
+    }
+
+}
+
+
+/* =========================================================
+   SHOW CURRENT QUESTION
+========================================================= */
+
+function showQuestion() {
+
+
+    if (!quizLoaded) {
+
+        return;
+
+    }
+
+
+    const currentQuestion =
+        questions[
+            currentQuestionIndex
+        ];
+
+
+    if (!currentQuestion) {
+
+        return;
+
+    }
+
+
+    /* ================= CURRENT ANSWER ================= */
+
+    selectedAnswer =
+        answers[
+            currentQuestionIndex
+        ];
+
+
+    /* ================= QUESTION NUMBER ================= */
+
+    document.getElementById(
+        "questionNumber"
+    ).textContent =
+        currentQuestionIndex + 1;
+
+
+    /* ================= QUESTION TEXT ================= */
+
+    document.getElementById(
+        "questionText"
+    ).textContent =
+        currentQuestion.question;
+
+
+    /* ================= OPTIONS ================= */
+
+    renderOptions(
+        currentQuestion.options
+    );
+
+
+    /* ================= PROGRESS ================= */
+
+    updateProgress();
+
+
+    /* ================= BUTTONS ================= */
+
+    const previousButton =
+        document.getElementById(
+            "previousButton"
+        );
+
+
+    const nextButton =
+        document.getElementById(
+            "nextButton"
+        );
+
+
+    /* ================= PREVIOUS ================= */
+
+    previousButton.disabled =
+        currentQuestionIndex === 0;
+
+
+    /* ================= NEXT TEXT ================= */
+
+    if (
+        currentQuestionIndex ===
+        questions.length - 1
+    ) {
+
+        nextButton.textContent =
+            "Finish Quiz";
+
+    }
+
+    else {
+
+        nextButton.textContent =
+            "Next →";
+
+    }
+
+
+    /* ================= NEXT STATE ================= */
+
+    nextButton.disabled =
+        selectedAnswer === null;
+
+}
+
+
+/* =========================================================
+   RENDER OPTIONS
+========================================================= */
+
+function renderOptions(options) {
+
+
+    const container =
+        document.getElementById(
+            "optionsContainer"
+        );
+
+
+    container.innerHTML =
+        "";
+
+
+    if (!Array.isArray(options)) {
+
+        return;
+
+    }
+
+
+    options
+        .slice(0, 4)
+        .forEach(
+            function (option) {
+
+
+                const button =
+                    document.createElement(
+                        "button"
+                    );
+
+
+                button.type =
+                    "button";
+
+
+                button.className =
+                    "option-button";
+
+
+                button.textContent =
+                    option;
+
+
+                /* ================= RESTORE SELECTED ================= */
+
+                if (
+                    selectedAnswer ===
+                    option
+                ) {
+
+                    button.classList.add(
+                        "selected"
+                    );
+
+                }
+
+
+                /* ================= CLICK ================= */
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        selectOption(
+                            button,
+                            option
+                        );
+
+                    }
+                );
+
+
+                container.appendChild(
+                    button
+                );
+
+            }
+        );
+
+}
+
+
+/* =========================================================
+   SELECT OPTION
+========================================================= */
+
+function selectOption(
+    button,
+    answer
+) {
+
+
+    const allOptions =
+        document.querySelectorAll(
+            ".option-button"
+        );
+
+
+    allOptions.forEach(
+        function (option) {
+
+            option.classList.remove(
+                "selected"
+            );
+
+        }
+    );
+
+
+    /* ================= SELECTED STYLE ================= */
+
+    button.classList.add(
+        "selected"
+    );
+
+
+    /* ================= SAVE ANSWER ================= */
+
+    selectedAnswer =
+        answer;
+
+
+    answers[
+        currentQuestionIndex
+    ] =
+        answer;
+
+
+    /* ================= ENABLE NEXT ================= */
+
+    document.getElementById(
+        "nextButton"
+    ).disabled =
+        false;
+
+
+    document.getElementById(
+        "quizError"
+    ).textContent =
+        "";
+
+}
+
+
+/* =========================================================
+   NEXT QUESTION
+========================================================= */
+
+function nextQuestion() {
+
+
+    if (!quizLoaded) {
+
+        return;
+
+    }
+
+
+    /* ================= CHECK ANSWER ================= */
+
+    if (
+        selectedAnswer === null
+        ||
+        selectedAnswer === undefined
+        ||
+        selectedAnswer === ""
+    ) {
+
+
+        document.getElementById(
+            "quizError"
+        ).textContent =
+            "Please select an option first.";
+
+        return;
+
+    }
+
+
+    /* ================= SAVE CURRENT ANSWER ================= */
+
+    answers[
+        currentQuestionIndex
+    ] =
+        selectedAnswer;
+
+
+    /* ================= LAST QUESTION ================= */
+
+    if (
+        currentQuestionIndex >=
+        questions.length - 1
+    ) {
+
+        finishQuiz();
+
+        return;
+
+    }
+
+
+    /* ================= MOVE NEXT ================= */
+
+    currentQuestionIndex++;
+
+
+    /* ================= RESTORE ANSWER ================= */
+
+    selectedAnswer =
+        answers[
+            currentQuestionIndex
+        ];
+
+
+    /* ================= SHOW NEXT ================= */
+
+    showQuestion();
+
+}
+
+
+/* =========================================================
+   PREVIOUS QUESTION
+========================================================= */
+
+function previousQuestion() {
+
+
+    if (
+        currentQuestionIndex <= 0
+    ) {
+
+        return;
+
+    }
+
+
+    /* ================= MOVE BACK ================= */
+
+    currentQuestionIndex--;
+
+
+    /* ================= RESTORE ANSWER ================= */
+
+    selectedAnswer =
+        answers[
+            currentQuestionIndex
+        ];
+
+
+    /* ================= SHOW QUESTION ================= */
+
+    showQuestion();
+
+}
+
+
+/* =========================================================
+   UPDATE PROGRESS
+========================================================= */
+
+function updateProgress() {
+
+
+    if (!questions.length) {
+
+        return;
+
+    }
+
+
+    const progress =
+        (
+            (
+                currentQuestionIndex + 1
+            )
+            /
+            questions.length
+        ) * 100;
+
+
+    document.getElementById(
+        "progressBar"
+    ).style.width =
+        progress + "%";
+
+}
+
+
+/* =========================================================
+   FINISH QUIZ
+========================================================= */
+
+async function finishQuiz() {
+
+
+    if (quizFinished) {
+
+        return;
+
+    }
+
+
+    quizFinished = true;
+
+
+    /* ================= SAVE LAST ANSWER ================= */
+
+    answers[
+        currentQuestionIndex
+    ] =
+        selectedAnswer;
+
+
+    /* =====================================================
+       CALCULATE SCORE
+    ===================================================== */
+
+    let correctCount = 0;
+
+    let wrongCount = 0;
+
+
+    questions.forEach(
+        function (
+            question,
+            index
+        ) {
+
+
+            const userAnswer =
+                answers[index];
+
+
+            const correctAnswer =
+                question.correct_answer;
+
+
+            /*
+             * Correct answer available hone par
+             * hi score calculate hoga.
+             */
+
+            if (
+                correctAnswer !== undefined
+                &&
+                correctAnswer !== null
+                &&
+                String(
+                    correctAnswer
+                ).trim() !== ""
+            ) {
+
+
+                if (
+                    String(
+                        userAnswer
+                    )
+                    .trim()
+                    .toLowerCase()
+                    ===
+                    String(
+                        correctAnswer
+                    )
+                    .trim()
+                    .toLowerCase()
+                ) {
+
+                    correctCount++;
+
+                }
+
+                else {
+
+                    wrongCount++;
+
+                }
+
+            }
+
+        }
+    );
+
+
+    /* =====================================================
+       TOTAL
+    ===================================================== */
+
+    const total =
+        questions.length;
+
+
+    /* =====================================================
+       PERCENTAGE
+    ===================================================== */
+
+    const percentage =
+        total > 0
+            ? Math.round(
+                (
+                    correctCount /
+                    total
+                ) * 100
+            )
+            : 0;
+
+
+    /* =====================================================
+       HIDE QUIZ
+    ===================================================== */
+
+    document.getElementById(
+        "quizContent"
+    ).style.display =
+        "none";
+
+
+    /* =====================================================
+       HIDE INTEREST
+    ===================================================== */
+
+    document.getElementById(
+        "interestSection"
+    ).style.display =
+        "none";
+
+
+    /* =====================================================
+       HIDE PROGRESS
+    ===================================================== */
+
+    const progressContainer =
+        document.querySelector(
+            ".progress-container"
+        );
+
+
+    if (progressContainer) {
+
+        progressContainer.style.display =
+            "none";
+
+    }
+
+
+    /* =====================================================
+       HIDE QUESTION COUNT
+    ===================================================== */
+
+    const questionCount =
+        document.querySelector(
+            ".question-count"
+        );
+
+
+    if (questionCount) {
+
+        questionCount.style.display =
+            "none";
+
+    }
+
+
+    /* =====================================================
+       SHOW RESULT
+    ===================================================== */
+
+    document.getElementById(
+        "resultBox"
+    ).style.display =
+        "block";
+
+
+    /* =====================================================
+       INTEREST AREA
+    ===================================================== */
+
+    document.getElementById(
+        "resultInterest"
+    ).textContent =
+        userInterest;
+
+
+    /* =====================================================
+       OVERALL SCORE
+    ===================================================== */
+
+    document.getElementById(
+        "scoreValue"
+    ).textContent =
+        correctCount +
+        " / " +
+        total;
+
+
+    /* =====================================================
+       PERCENTAGE
+    ===================================================== */
+
+    document.getElementById(
+        "percentageValue"
+    ).textContent =
+        percentage +
+        "%";
+
+
+    /* =====================================================
+       TOTAL QUESTIONS
+    ===================================================== */
+
+    document.getElementById(
+        "totalQuestionsResult"
+    ).textContent =
+        total;
+
+
+    /* =====================================================
+       CORRECT ANSWERS
+    ===================================================== */
+
+    document.getElementById(
+        "correctValue"
+    ).textContent =
+        correctCount;
+
+
+    /* =====================================================
+       WRONG ANSWERS
+    ===================================================== */
+
+    document.getElementById(
+        "wrongValue"
+    ).textContent =
+        wrongCount;
+
+
+    /* =====================================================
+       PERFORMANCE
+    ===================================================== */
+
+    let performance = "";
+
+
+    if (percentage >= 80) {
+
+        performance =
+            "Excellent Performance!";
+
+    }
+
+    else if (percentage >= 60) {
+
+        performance =
+            "Good Performance!";
+
+    }
+
+    else if (percentage >= 40) {
+
+        performance =
+            "Average Performance!";
+
+    }
+
+    else {
+
+        performance =
+            "Needs Improvement!";
+
+    }
+
+
+    document.getElementById(
+        "performanceMessage"
+    ).textContent =
+        performance;
+
+
+    /* =====================================================
+       RESULT DESCRIPTION
+    ===================================================== */
+
+    document.getElementById(
+        "resultText"
+    ).textContent =
+        "Your aptitude quiz has been completed based on your selected subject.";
+
+
+    /* =====================================================
+       SHOW TEMPORARY AI MESSAGE
+    ===================================================== */
+
+    document.getElementById(
+        "overallResult"
+    ).textContent =
+        "Analyzing your responses...";
+
+
+    document.getElementById(
+        "analysisResult"
+    ).textContent =
+        "Generating your personalized career analysis...";
+
+
+    /* =====================================================
+       AI ANALYSIS
+    ===================================================== */
+
+    try {
+
+
+        const response =
+            await fetch(
+                "{% url 'career_aptitude_api' %}",
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+
+                    body:
+                        JSON.stringify({
+
+                            action:
+                                "analyze",
+
+                            subject:
+                                userInterest,
+
+                            interest:
+                                userInterest,
+
+                            questions:
+                                questions,
+
+                            answers:
+                                answers
+
+                        })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        /* ================= ERROR ================= */
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                "Unable to generate AI analysis."
+            );
+
+        }
+
+
+        /* =================================================
+           OVERALL RESULT
+        ================================================= */
+
+        document.getElementById(
+            "overallResult"
+        ).textContent =
+            data.overall_result ||
+            "No overall result available.";
+
+
+        /* =================================================
+           STRENGTHS
+        ================================================= */
+
+        const strengthsContainer =
+            document.getElementById(
+                "strengthsResult"
+            );
+
+
+        strengthsContainer.innerHTML =
+            "";
+
+
+        if (
+            Array.isArray(
+                data.strengths
+            )
+        ) {
+
+
+            data.strengths.forEach(
+                function (item) {
+
+
+                    const div =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    div.textContent =
+                        "✓ " +
+                        item;
+
+
+                    strengthsContainer.appendChild(
+                        div
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           INTERESTS
+        ================================================= */
+
+        const interestsContainer =
+            document.getElementById(
+                "interestsResult"
+            );
+
+
+        interestsContainer.innerHTML =
+            "";
+
+
+        if (
+            Array.isArray(
+                data.interests
+            )
+        ) {
+
+
+            data.interests.forEach(
+                function (item) {
+
+
+                    const div =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    div.textContent =
+                        "• " +
+                        item;
+
+
+                    interestsContainer.appendChild(
+                        div
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           CAREER AREAS
+        ================================================= */
+
+        const careerAreasContainer =
+            document.getElementById(
+                "careerAreasResult"
+            );
+
+
+        careerAreasContainer.innerHTML =
+            "";
+
+
+        if (
+            Array.isArray(
+                data.career_areas
+            )
+        ) {
+
+
+            data.career_areas.forEach(
+                function (item) {
+
+
+                    const div =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    div.textContent =
+                        "→ " +
+                        item;
+
+
+                    careerAreasContainer.appendChild(
+                        div
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           OVERALL ANALYSIS
+        ================================================= */
+
+        document.getElementById(
+            "analysisResult"
+        ).textContent =
+            data.analysis ||
+            "No analysis available.";
+
+
+    }
+
+
+    catch (error) {
+
+
+        console.error(
+            "Career Aptitude Analysis Error:",
+            error
+        );
+
+
+        document.getElementById(
+            "overallResult"
+        ).textContent =
+            "AI analysis could not be generated right now.";
+
+
+        document.getElementById(
+            "analysisResult"
+        ).textContent =
+            error.message;
+
+    }
+
+
+    /* =====================================================
+       QUESTION-WISE RESULT
+    ===================================================== */
+
+    showQuestionResults();
+
+}
+
+
+/* =========================================================
+   QUESTION-WISE RESULT
+========================================================= */
+
+function showQuestionResults() {
+
+
+    const container =
+        document.getElementById(
+            "questionResults"
+        );
+
+
+    container.innerHTML =
+        "";
+
+
+    questions.forEach(
+        function (
+            question,
+            index
+        ) {
+
+
+            const userAnswer =
+                answers[index];
+
+
+            const correctAnswer =
+                question.correct_answer;
+
+
+            const resultItem =
+                document.createElement(
+                    "div"
+                );
+
+
+            resultItem.className =
+                "question-result-item";
+
+
+            /* =================================================
+               CHECK CORRECT ANSWER
+            ================================================= */
+
+            if (
+                correctAnswer !== undefined
+                &&
+                correctAnswer !== null
+                &&
+                String(
+                    correctAnswer
+                ).trim() !== ""
+            ) {
+
+
+                const isCorrect =
+                    String(
+                        userAnswer
+                    )
+                    .trim()
+                    .toLowerCase()
+                    ===
+                    String(
+                        correctAnswer
+                    )
+                    .trim()
+                    .toLowerCase();
+
+
+                /* ================= CORRECT ================= */
+
+                if (isCorrect) {
+
+
+                    resultItem.classList.add(
+                        "correct"
+                    );
+
+
+                    resultItem.innerHTML = `
+
+                        <strong>
+                            Q${index + 1} ✓ Correct
+                        </strong>
+
+                        <small>
+                            Your Answer:
+                            ${escapeHtml(
+                                userAnswer
+                            )}
+                        </small>
+
+                    `;
+
+                }
+
+
+                /* ================= WRONG ================= */
+
+                else {
+
+
+                    resultItem.classList.add(
+                        "wrong"
+                    );
+
+
+                    resultItem.innerHTML = `
+
+                        <strong>
+                            Q${index + 1} ✗ Wrong
+                        </strong>
+
+                        <small>
+                            Your Answer:
+                            ${escapeHtml(
+                                userAnswer
+                            )}
+                        </small>
+
+                        <small>
+                            Correct Answer:
+                            ${escapeHtml(
+                                correctAnswer
+                            )}
+                        </small>
+
+                    `;
+
+                }
+
+            }
+
+
+            /* =================================================
+               CORRECT ANSWER MISSING
+            ================================================= */
+
+            else {
+
+
+                resultItem.innerHTML = `
+
+                    <strong>
+                        Q${index + 1}
+                    </strong>
+
+                    <small>
+                        Your Answer:
+                        ${escapeHtml(
+                            userAnswer ||
+                            "Not answered"
+                        )}
+                    </small>
+
+                    <small>
+                        Correct answer was not provided by the API.
+                    </small>
+
+                `;
+
+            }
+
+
+            container.appendChild(
+                resultItem
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHtml(value) {
+
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =========================================================
+   RESTART QUIZ
+========================================================= */
+
+function restartQuiz() {
+
+
+    questions = [];
+
+    answers = [];
+
+    currentQuestionIndex = 0;
+
+    selectedAnswer = null;
+
+    quizLoaded = false;
+
+    quizFinished = false;
+
+
+    /* ================= CLEAR OLD RESULT ================= */
+
+    document.getElementById(
+        "overallResult"
+    ).textContent =
+        "-";
+
+
+    document.getElementById(
+        "analysisResult"
+    ).textContent =
+        "-";
+
+
+    document.getElementById(
+        "strengthsResult"
+    ).innerHTML =
+        "";
+
+
+    document.getElementById(
+        "interestsResult"
+    ).innerHTML =
+        "";
+
+
+    document.getElementById(
+        "careerAreasResult"
+    ).innerHTML =
+        "";
+
+
+    document.getElementById(
+        "questionResults"
+    ).innerHTML =
+        "";
+
+
+    /* ================= RESULT HIDE ================= */
+
+    document.getElementById(
+        "resultBox"
+    ).style.display =
+        "none";
+
+
+    /* ================= QUIZ HIDE ================= */
+
+    document.getElementById(
+        "quizContent"
+    ).style.display =
+        "none";
+
+
+    /* ================= INTEREST SHOW ================= */
+
+    document.getElementById(
+        "interestSection"
+    ).style.display =
+        "block";
+
+
+    /* ================= INPUT ================= */
+
+    document.getElementById(
+        "interestInput"
+    ).value =
+        userInterest;
+
+
+    /* ================= ERROR CLEAR ================= */
+
+    document.getElementById(
+        "interestError"
+    ).textContent =
+        "";
+
+
+    document.getElementById(
+        "quizError"
+    ).textContent =
+        "";
+
+
+    /* ================= PROGRESS ================= */
+
+    document.getElementById(
+        "progressBar"
+    ).style.width =
+        "0%";
+
+
+    const progressContainer =
+        document.querySelector(
+            ".progress-container"
+        );
+
+
+    if (progressContainer) {
+
+        progressContainer.style.display =
+            "block";
+
+    }
+
+
+    /* ================= QUESTION COUNT ================= */
+
+    const questionCount =
+        document.querySelector(
+            ".question-count"
+        );
+
+
+    if (questionCount) {
+
+        questionCount.style.display =
+            "block";
+
+    }
+
+
+    /* ================= RESET BUTTONS ================= */
+
+    document.getElementById(
+        "nextButton"
+    ).textContent =
+        "Next →";
+
+
+    document.getElementById(
+        "nextButton"
+    ).disabled =
+        true;
+
+
+    document.getElementById(
+        "previousButton"
+    ).disabled =
+        true;
+
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+function showLoading(
+    show,
+    message =
+        "Preparing your personalized aptitude quiz..."
+) {
+
+
+    const loadingBox =
+        document.getElementById(
+            "loadingBox"
+        );
+
+
+    const quizContent =
+        document.getElementById(
+            "quizContent"
+        );
+
+
+    const loadingMessage =
+        document.getElementById(
+            "loadingMessage"
+        );
+
+
+    if (loadingMessage) {
+
+        loadingMessage.textContent =
+            message;
+
+    }
+
+
+    if (show) {
+
+
+        loadingBox.style.display =
+            "flex";
+
+
+        quizContent.style.display =
+            "none";
+
+    }
+
+    else {
+
+
+        loadingBox.style.display =
+            "none";
+
+
+        if (!quizLoaded) {
+
+            quizContent.style.display =
+                "none";
+
+        }
+
+    }
+
+}
+
+</script>
+
+
+</body>
+
+</html>

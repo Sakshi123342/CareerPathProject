@@ -1,0 +1,181 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f2ff;
+    color: #25213b;
+    padding: 30px 16px;
+}
+
+h1 {
+    text-align: center;
+    color: #5b35b5;
+    margin-bottom: 10px;
+}
+
+body > p {
+    text-align: center;
+    color: #6f6a80;
+    margin-bottom: 28px;
+}
+
+.interview-container {
+    max-width: 850px;
+    margin: auto;
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(45, 30, 90, 0.1);
+}
+
+.interview-settings {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.interview-settings label {
+    font-weight: bold;
+    align-self: end;
+}
+
+.interview-settings select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d8d1ef;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 15px;
+}
+
+button {
+    padding: 12px 18px;
+    background: #6842c2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+button:hover {
+    background: #50309d;
+}
+
+button:disabled {
+    background: #aaa2bd;
+    cursor: not-allowed;
+}
+
+#startBtn {
+    grid-column: 1 / -1;
+}
+
+.chat-box {
+    height: 400px;
+    overflow-y: auto;
+    border: 1px solid #e2ddf0;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    background: #fbfaff;
+}
+
+.welcome-message {
+    color: #777;
+    text-align: center;
+    margin-top: 150px;
+}
+
+.chat-message {
+    max-width: 90%;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    border-radius: 12px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
+.chat-message strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.chat-message.assistant {
+    background: #eee8ff;
+    margin-right: auto;
+}
+
+.chat-message.user {
+    background: #6842c2;
+    color: white;
+    margin-left: auto;
+}
+
+#answerForm {
+    display: flex;
+    gap: 10px;
+}
+
+#answerInput {
+    flex: 1;
+    min-width: 0;
+    padding: 13px;
+    border: 1px solid #d8d1ef;
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+#statusMessage {
+    color: #c0392b;
+    margin-top: 12px;
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 20px 10px;
+    }
+
+    .interview-container {
+        padding: 14px;
+    }
+
+    .interview-settings {
+        grid-template-columns: 1fr;
+    }
+
+    #startBtn {
+        grid-column: auto;
+    }
+
+    .chat-box {
+        height: 350px;
+    }
+}
+.back-button-container {
+    text-align: center;
+    margin-top: 25px;
+}
+
+.back-button {
+    display: inline-block;
+    padding: 12px 24px;
+    background: #6842c2;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: background 0.3s;
+}
+
+.back-button:hover {
+    background: #50309d;
+}

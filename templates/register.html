@@ -1,0 +1,348 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Register - CareerPath</title>
+
+    <link rel="stylesheet" href="{% static 'css/register.css' %}">
+
+</head>
+
+
+<body>
+
+
+    <!-- Navbar -->
+
+    <header>
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                🎓
+            </div>
+
+            CareerPath
+
+        </div>
+
+
+        <nav>
+
+            <a href="/">
+                Home
+            </a>
+
+            <a href="/about/">
+                About Us
+            </a>
+
+            <a href="/contact/">
+                Contact
+            </a>
+
+            <a class="login-btn" href="/login/">
+                Login
+            </a>
+
+        </nav>
+
+    </header>
+
+
+
+    <!-- Register Section -->
+
+    <main>
+
+        <section class="register-section">
+
+
+            <div class="register-container">
+
+
+                <!-- Left Side -->
+
+                <div class="register-info">
+
+                    <div class="small-label">
+                        🎯 Start Your Journey
+                    </div>
+
+
+                    <h1>
+                        Build Your
+                        <span>Career Path</span>
+                    </h1>
+
+
+                    <p>
+
+                        Create your CareerPath account and discover
+                        career opportunities based on your interests,
+                        strengths and goals.
+
+                    </p>
+
+
+                    <div class="feature">
+
+                        <div class="feature-icon">
+                            🎯
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                Personalized Career Guidance
+                            </h3>
+
+                            <p>
+                                Find careers that match your profile.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="feature">
+
+                        <div class="feature-icon">
+                            📊
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                Identify Your Strengths
+                            </h3>
+
+                            <p>
+                                Understand your skills and interests.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="feature">
+
+                        <div class="feature-icon">
+                            🚀
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                Plan Your Future
+                            </h3>
+
+                            <p>
+                                Get a personalized learning roadmap.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- Register Form -->
+
+                <div class="register-card">
+
+
+                    <div class="form-heading">
+
+                        <h2>
+                            Create Account
+                        </h2>
+
+                        <p>
+                            Join CareerPath today
+                        </p>
+                        {% if error %}
+                        <p style="color: red; text-align: center;">
+                            {{ error }}
+                        </p>
+                        {% endif %}
+                    </div>
+
+
+                    <form method="POST">
+
+                        {% csrf_token %}
+
+
+                        <!-- Full Name -->
+
+                        <div class="form-group">
+
+                            <label for="name">
+                                Full Name
+                            </label>
+
+                            <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+
+                        </div>
+
+
+
+                        <!-- Email -->
+
+                        <div class="form-group">
+
+                            <label for="email">
+                                Email Address
+                            </label>
+
+                            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+
+                        </div>
+
+
+
+                        <!-- Phone -->
+
+                        <div class="form-group">
+
+                            <label for="phone">
+                                Phone Number
+                            </label>
+
+                            <input type="tel" id="phone" name="phone" placeholder="Enter your phone number">
+
+                        </div>
+
+
+
+                        <!-- Education -->
+
+                        <div class="form-group">
+
+                            <label for="education">
+                                Education
+                            </label>
+
+                            <select id="education" name="education">
+
+                                <option value="">
+                                    Select Education
+                                </option>
+
+                                <option value="10th">
+                                    10th
+                                </option>
+
+                                <option value="12th">
+                                    12th
+                                </option>
+
+                                <option value="Diploma">
+                                    Diploma
+                                </option>
+
+                                <option value="Graduation">
+                                    Graduation
+                                </option>
+
+                                <option value="Post Graduation">
+                                    Post Graduation
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+
+                        <!-- Password -->
+
+                        <div class="form-group">
+
+                            <label for="password">
+                                Password
+                            </label>
+
+                            <input type="password" id="password" name="password" placeholder="Create a password"
+                                required>
+
+                        </div>
+
+
+
+                        <!-- Confirm Password -->
+
+                        <div class="form-group">
+
+                            <label for="confirm_password">
+                                Confirm Password
+                            </label>
+
+                            <input type="password" id="confirm_password" name="confirm_password"
+                                placeholder="Confirm your password" required>
+
+                        </div>
+
+
+
+                        <!-- Submit -->
+
+                        <button type="submit" class="register-btn">
+
+                            Create Account →
+
+                        </button>
+
+
+                    </form>
+
+
+                    <div class="login-text">
+
+                        Already have an account?
+
+                        <a href="/login/">
+                            Login
+                        </a>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+
+    <!-- Footer -->
+
+    <footer>
+
+        <p>
+            © 2026 CareerPath. Build your future with confidence.
+        </p>
+
+    </footer>
+
+
+</body>
+
+</html>

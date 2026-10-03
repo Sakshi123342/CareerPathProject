@@ -1,0 +1,90 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | CareerPath</title>
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+</head>
+<body>
+
+<header class="navbar">
+    <a href="/" class="logo">🎓 CareerPath</a>
+    <a href="/" class="home-link">Back to Home</a>
+</header>
+
+<main class="login-container">
+
+    <section class="welcome-section">
+        <span class="welcome-tag">WELCOME BACK</span>
+        <h1>Continue Your<br><span>Career Journey</span></h1>
+        <p>
+            Sign in to explore your career recommendations,
+            track your progress and continue planning your future.
+        </p>
+
+        <div class="welcome-points">
+            <div>✓ Explore personalized career paths</div>
+            <div>✓ Continue your learning roadmap</div>
+            <div>✓ Track your career progress</div>
+        </div>
+    </section>
+
+    <section class="login-card">
+        <div class="login-icon">👋</div>
+
+        <h2>Welcome Back!</h2>
+        <p class="login-subtitle">Please login to your account</p>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Enter your registered email"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="login-btn">
+                Login to Account →
+            </button>
+        </form>
+
+        <p class="register-text">
+            Don't have an account?
+            <a href="/register/">Create Account</a>
+        </p>
+    </section>
+
+</main>
+
+<footer>
+    <p>© 2026 CareerPath. Build your future with confidence.</p>
+</footer>
+
+</body>
+</html>

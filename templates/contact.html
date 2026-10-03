@@ -1,0 +1,133 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | CareerPath</title>
+    <link rel="stylesheet" href="{% static 'css/contact.css' %}">
+</head>
+<body>
+
+<header class="navbar">
+    <a href="/" class="logo">🎓 CareerPath</a>
+
+    <nav>
+        <a href="/">Home</a>
+        <a href="/explore_careers/">Explore Careers</a>
+        <a href="/work/">How It Works</a>
+        <a href="/about/">About Us</a>
+        <a href="/contact/" class="active">Contact Us</a>
+    </nav>
+</header>
+
+<main>
+    <section class="contact-hero">
+        <span class="tag">WE'RE HERE TO HELP</span>
+        <h1>Get in <span>Touch</span></h1>
+        <p>
+            Have a question or suggestion? Send us a message.
+            We would love to hear from you.
+        </p>
+    </section>
+
+    <section class="contact-layout">
+
+        <div class="contact-info">
+            <span class="small-label">CONTACT CAREERPATH</span>
+            <h2>Let's Talk</h2>
+            <p>
+                If you need help with career guidance or have
+                feedback about CareerPath, feel free to contact us.
+            </p>
+
+            <div class="info-card">
+                <div class="info-icon">✉️</div>
+                <div>
+                    <h3>Email</h3>
+                    <p>Send us your questions or feedback.</p>
+                    <a href="mailto:careerpath@example.com">
+                        careerpath@example.com
+                    </a>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-icon">🎯</div>
+                <div>
+                    <h3>Our Purpose</h3>
+                    <p>
+                        Helping students explore careers and
+                        plan their learning journey.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="contact-form-card">
+            <h2>Send Us a Message</h2>
+            <p class="form-description">
+                Fill out the form below and share your message.
+            </p>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        placeholder="Enter your name"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Enter your email"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <input
+                        type="text"
+                        id="subject"
+                        name="subject"
+                        placeholder="Enter message subject"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Your Message</label>
+                    <textarea
+                        id="message"
+                        name="message"
+                        rows="5"
+                        placeholder="Write your message here..."
+                        required
+                    ></textarea>
+                </div>
+
+                <button type="submit">Send Message →</button>
+            </form>
+        </div>
+
+    </section>
+</main>
+
+<footer>
+    <p>© 2026 CareerPath. Build your future with confidence.</p>
+</footer>
+
+</body>
+</html>

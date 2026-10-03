@@ -1,0 +1,361 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Career Assessment - CareerPath</title>
+
+    <link rel="stylesheet" href="{% static 'css/career_assessment.css' %}">
+
+</head>
+
+<body>
+
+
+    <!-- ==================== NAVBAR ==================== -->
+
+    <header>
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                🎓
+            </div>
+
+            CareerPath
+
+        </div>
+
+
+        <nav>
+
+            <a href="/">
+                Home
+            </a>
+
+            <a href="/explore_careers/">
+                Explore Careers
+            </a>
+
+            <a href="/work/">
+                How It Works
+            </a>
+
+            <a href="/about/">
+                About Us
+            </a>
+
+        </nav>
+
+    </header>
+
+
+
+    <!-- ==================== ASSESSMENT ==================== -->
+
+    <main>
+
+        <section class="assessment-section">
+
+            <div class="assessment-container">
+
+
+                <!-- Heading -->
+
+                <div class="assessment-heading">
+
+                    <div class="small-label">
+                        🎯 Career Assessment
+                    </div>
+
+                    <h1>
+                        Discover Your <span>Career Direction</span>
+                    </h1>
+
+                    <p>
+                        Answer a few questions about your interests,
+                        strengths and goals.
+                    </p>
+
+                </div>
+
+
+
+                <!-- Assessment Card -->
+
+                <div class="assessment-card">
+
+
+                    <div class="card-header">
+
+                        <h2>
+                            Tell Us About You
+                        </h2>
+
+                        <p>
+                            Your answers will help us find careers
+                            that match your profile.
+                        </p>
+
+                    </div>
+
+
+
+                    <form method="POST">
+
+                        {% csrf_token %}
+
+
+
+                        <!-- ==================== INTEREST ==================== -->
+
+                        <div class="form-group">
+
+                            <label for="interest">
+                                1. What are you most interested in?
+                            </label>
+
+                            <select
+                                id="interest"
+                                name="interest"
+                                required
+                            >
+
+                                <option value="">
+                                    Select your interest
+                                </option>
+
+                                <option value="Technology">
+                                    Technology & Computers
+                                </option>
+
+                                <option value="Data">
+                                    Data & Analytics
+                                </option>
+
+                                <option value="Design">
+                                    Design & Creativity
+                                </option>
+
+                                <option value="Business">
+                                    Business & Management
+                                </option>
+
+                                <option value="Healthcare">
+                                    Healthcare
+                                </option>
+
+                                <option value="Science">
+                                    Science & Research
+                                </option>
+
+                                <option value="Law">
+                                    Law & Legal Services
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+
+                        <!-- ==================== STRENGTH ==================== -->
+
+                        <div class="form-group">
+
+                            <label for="strength">
+                                2. What is your strongest skill?
+                            </label>
+
+                            <select
+                                id="strength"
+                                name="strength"
+                                required
+                            >
+
+                                <option value="">
+                                    Select your strength
+                                </option>
+
+                                <option value="Problem Solving">
+                                    Problem Solving
+                                </option>
+
+                                <option value="Programming">
+                                    Programming
+                                </option>
+
+                                <option value="Communication">
+                                    Communication
+                                </option>
+
+                                <option value="Creativity">
+                                    Creativity
+                                </option>
+
+                                <option value="Analytical Thinking">
+                                    Analytical Thinking
+                                </option>
+
+                                <option value="Leadership">
+                                    Leadership
+                                </option>
+
+                                <option value="Teamwork">
+                                    Teamwork
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+
+                        <!-- ==================== WORK STYLE ==================== -->
+
+                        <div class="form-group">
+
+                            <label for="work_style">
+                                3. Which work style suits you best?
+                            </label>
+
+                            <select
+                                id="work_style"
+                                name="work_style"
+                                required
+                            >
+
+                                <option value="">
+                                    Select your work style
+                                </option>
+
+                                <option value="Independent">
+                                    Working Independently
+                                </option>
+
+                                <option value="Team">
+                                    Working in a Team
+                                </option>
+
+                                <option value="Creative">
+                                    Creative & Flexible Environment
+                                </option>
+
+                                <option value="Structured">
+                                    Structured & Organized Environment
+                                </option>
+
+                                <option value="Leadership">
+                                    Leading a Team
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+
+                        <!-- ==================== CAREER GOAL ==================== -->
+
+                        <div class="form-group">
+
+                            <label for="career_goal">
+                                4. What is your career goal?
+                            </label>
+
+                            <textarea
+                                id="career_goal"
+                                name="career_goal"
+                                rows="4"
+                                placeholder="Example: I want to become an AI/ML Engineer..."
+                                required
+                            ></textarea>
+
+                        </div>
+
+
+
+                        <!-- ==================== BUTTON ==================== -->
+
+                        <button
+                            type="submit"
+                            class="assessment-btn"
+                        >
+                            Complete Assessment →
+                        </button>
+
+
+                    </form>
+
+
+                </div>
+
+
+
+                <!-- Progress -->
+
+                <div class="assessment-progress">
+
+                    <div class="progress-step completed">
+
+                        <span>✓</span>
+
+                        Profile
+
+                    </div>
+
+
+                    <div class="progress-line completed-line"></div>
+
+
+                    <div class="progress-step active">
+
+                        <span>2</span>
+
+                        Assessment
+
+                    </div>
+
+
+                    <div class="progress-line"></div>
+
+
+                    <div class="progress-step">
+
+                        <span>3</span>
+
+                        Career Match
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+
+    <!-- ==================== FOOTER ==================== -->
+
+    <footer>
+
+        <p>
+            © 2026 CareerPath. Build your future with confidence.
+        </p>
+
+    </footer>
+
+
+</body>
+
+</html>

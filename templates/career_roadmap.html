@@ -1,0 +1,132 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ career_name }} Learning Roadmap | CareerPath</title>
+    <link rel="stylesheet" href="{% static 'css/career_roadmap.css' %}">
+</head>
+<body>
+
+<header>
+    <div class="logo">🎓 CareerPath</div>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/explore_careers/">Explore Careers</a>
+        <a href="/career_match/">Career Match</a>
+    </nav>
+</header>
+
+<main>
+<section class="roadmap-section">
+
+    <div class="top-label">🚀 Your Learning Journey</div>
+
+    <div class="roadmap-hero">
+        <div class="career-icon">🎯</div>
+        <span>Personalized Career Roadmap</span>
+        <h1>{{ career_name }}</h1>
+        <p>Follow your learning journey step by step and build the skills needed for your career.</p>
+    </div>
+
+    <div class="roadmap-content">
+        <h2>Your Learning Roadmap</h2>
+        <p>Click each level to explore what you need to learn.</p>
+
+        {% if error %}
+            <p class="error-message">{{ error }}</p>
+        {% endif %}
+
+        {% if roadmap %}
+        <div class="roadmap-steps">
+
+            {% for stage in roadmap.stages %}
+            <div class="roadmap-card">
+
+                <button class="roadmap-toggle"
+                        type="button"
+                        aria-expanded="false"
+                        aria-controls="stage-{{ forloop.counter }}"
+                        onclick="toggleStage(this, 'stage-{{ forloop.counter }}')">
+
+                    <span class="step-number">
+                        0{{ forloop.counter }}
+                    </span>
+
+                    <span class="stage-heading">
+                        <strong>{{ stage.title }}</strong>
+                        <small>{{ stage.duration }}</small>
+                    </span>
+
+                    <span class="toggle-icon">＋</span>
+                </button>
+
+                <div class="stage-details"
+                     id="stage-{{ forloop.counter }}"
+                     hidden>
+
+                    <h4>Skills to Learn</h4>
+                    <ul>
+                        {% for skill in stage.skills %}
+                            <li>{{ skill }}</li>
+                        {% endfor %}
+                    </ul>
+
+                    <h4>Practical Project</h4>
+                    <p>{{ stage.project }}</p>
+
+                    <h4>Learning Resources</h4>
+                    <ul>
+                        {% for resource in stage.resources %}
+                            <li>{{ resource }}</li>
+                        {% endfor %}
+                    </ul>
+
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+        {% else %}
+            {% if not error %}
+                <p>Roadmap content is not available yet.</p>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <div class="roadmap-cta">
+        <h2>Start building your future</h2>
+        <p>Learn consistently and track your progress.</p>
+        <a href="/career_match/" class="cta-btn">Back to Career Match →</a>
+    </div>
+
+    <div class="back-section">
+        <a href="/explore_careers/" class="back-btn">
+            ← Back to Explore Careers
+        </a>
+    </div>
+
+</section>
+</main>
+
+<footer>
+    <p>© 2026 CareerPath. Build your future with confidence.</p>
+</footer>
+
+<script>
+function toggleStage(button, panelId) {
+    const panel = document.getElementById(panelId);
+    const isOpen = !panel.hidden;
+
+    panel.hidden = isOpen;
+    button.setAttribute("aria-expanded", String(!isOpen));
+
+    const icon = button.querySelector(".toggle-icon");
+    icon.textContent = isOpen ? "＋" : "−";
+}
+</script>
+
+</body>
+</html>

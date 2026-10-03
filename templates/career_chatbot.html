@@ -1,0 +1,165 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Career Chatbot</title>
+
+    <link rel="stylesheet" href="{% static 'css/career_chatbot.css' %}">
+</head>
+
+<body>
+
+    <div class="page-wrapper">
+
+        <!-- Chatbot -->
+        <div class="chatbot-container">
+
+            <div class="chatbot-header">
+                <h1>AI Career Chatbot</h1>
+                <p>Your personal career guidance assistant</p>
+            </div>
+
+            <div class="chatbot-messages" id="chatMessages">
+                <div class="message bot-message">
+                    Hi! 👋 I am your AI Career Assistant.
+                    Ask me about Python, Django, AI/ML, careers,
+                    skills, courses, or interview preparation.
+                </div>
+            </div>
+
+            <form class="chatbot-input-area" id="chatForm">
+                <input
+                    type="text"
+                    id="userInput"
+                    placeholder="Ask your career question..."
+                    autocomplete="off"
+                    required
+                >
+
+                <button type="submit" id="sendBtn">
+                    Send
+                </button>
+            </form>
+
+        </div>
+
+        <!-- Back to Features Button -->
+        <div class="back-button-container">
+            <a href="/#features" class="back-button">
+                ← Back to Features
+            </a>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <script>
+        const chatForm = document.getElementById("chatForm");
+        const userInput = document.getElementById("userInput");
+        const chatMessages = document.getElementById("chatMessages");
+        const sendBtn = document.getElementById("sendBtn");
+
+        // Store conversation history
+        let conversationHistory = [];
+
+        function addMessage(message, className) {
+            const div = document.createElement("div");
+            div.className = "message " + className;
+
+            if (className === "bot-message") {
+                div.innerHTML = marked.parse(message);
+            } else {
+                div.textContent = message;
+            }
+
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            return div;
+        }
+
+        chatForm.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const question = userInput.value.trim();
+
+            if (!question) return;
+
+            addMessage(question, "user-message");
+
+            userInput.value = "";
+            sendBtn.disabled = true;
+
+            const loading = addMessage("Thinking...", "bot-message");
+
+            try {
+                const response = await fetch("/chatbot-api/", {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        message: question,
+                        history: conversationHistory
+                    })
+                });
+
+                const data = await response.json();
+
+                // Redirect if user is not logged in
+                if (response.status === 401 && data.redirect_url) {
+                    window.location.href = data.redirect_url;
+                    return;
+                }
+
+                loading.remove();
+
+                if (!response.ok) {
+                    addMessage(
+                        data.error || "Something went wrong. Please try again.",
+                        "bot-message"
+                    );
+                } else {
+                    addMessage(data.reply, "bot-message");
+
+                    conversationHistory.push(
+                        {
+                            role: "user",
+                            content: question
+                        },
+                        {
+                            role: "assistant",
+                            content: data.reply
+                        }
+                    );
+
+                    // Keep latest 10 messages
+                    conversationHistory = conversationHistory.slice(-10);
+                }
+
+            } catch (error) {
+                loading.remove();
+
+                addMessage(
+                    "Unable to connect to the server. Please try again.",
+                    "bot-message"
+                );
+
+                console.error("Chatbot Error:", error);
+
+            } finally {
+                sendBtn.disabled = false;
+                userInput.focus();
+            }
+        });
+    </script>
+
+</body>
+</html>

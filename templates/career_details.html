@@ -1,0 +1,293 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ career.name }} | CareerPath</title>
+
+    <link rel="stylesheet" href="{% static 'css/career_details.css' %}">
+
+</head>
+
+<body>
+
+
+    <!-- ================= NAVBAR ================= -->
+
+    <header>
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                🎓
+            </div>
+
+            CareerPath
+
+        </div>
+
+
+        <nav>
+
+            <a href="/">
+                Home
+            </a>
+
+            <a href="/explore_careers/">
+                Explore Careers
+            </a>
+
+            <a href="/work/">
+                How It Works
+            </a>
+
+            <a href="/about/">
+                About Us
+            </a>
+
+        </nav>
+
+    </header>
+
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main>
+
+        <section class="details-section">
+
+
+            <!-- ================= TOP LABEL ================= -->
+
+            <div class="top-label">
+                💼 Career Details
+            </div>
+
+
+
+            <!-- ================= CAREER HERO ================= -->
+
+            <div class="career-hero">
+
+                <div class="career-icon">
+                    {{ career.icon }}
+                </div>
+
+
+                <div class="career-info">
+
+                    <span class="career-category">
+                        {{ career.category }}
+                    </span>
+
+                    <h1>
+                        {{ career.name }}
+                    </h1>
+
+                    <p>
+                        {{ career.description }}
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ================= SKILLS SECTION ================= -->
+
+            <div class="skills-section">
+
+                <h2>
+                    Skills Required
+                </h2>
+
+                <p class="section-description">
+                    Build these important skills to start and grow
+                    your career in this field.
+                </p>
+
+
+                <div class="skills-grid">
+
+                    {% for skill in career.skills %}
+
+                    <div class="skill-card">
+
+                        <div class="skill-icon">
+                            ✓
+                        </div>
+
+                        <span>
+                            {{ skill }}
+                        </span>
+
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ================= CAREER PATH ================= -->
+
+            <div class="career-path">
+
+                <h2>
+                    Career Path
+                </h2>
+
+                <p>
+                    Start with the required skills, gain practical
+                    experience through projects and continuously
+                    improve your knowledge.
+                </p>
+
+
+                <div class="path-steps">
+
+                    <div class="path-step">
+
+                        <div class="step-number">
+                            1
+                        </div>
+
+                        <h3>
+                            Learn Skills
+                        </h3>
+
+                        <p>
+                            Learn the fundamental skills required
+                            for this career.
+                        </p>
+
+                    </div>
+
+
+                    <div class="path-step">
+
+                        <div class="step-number">
+                            2
+                        </div>
+
+                        <h3>
+                            Build Projects
+                        </h3>
+
+                        <p>
+                            Create practical projects to improve
+                            your knowledge and experience.
+                        </p>
+
+                    </div>
+
+
+                    <div class="path-step">
+
+                        <div class="step-number">
+                            3
+                        </div>
+
+                        <h3>
+                            Get Experience
+                        </h3>
+
+                        <p>
+                            Gain experience through internships,
+                            freelancing or real-world projects.
+                        </p>
+
+                    </div>
+
+
+                    <div class="path-step">
+
+                        <div class="step-number">
+                            4
+                        </div>
+
+                        <h3>
+                            Start Career
+                        </h3>
+
+                        <p>
+                            Apply for jobs and start your
+                            professional career.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ================= BOTTOM CTA ================= -->
+
+            <div class="career-cta">
+
+                <div>
+
+                    <h2>
+                        Interested in this career?
+                    </h2>
+
+                    <p>
+                        Take the Career Assessment to find out how
+                        well this career matches your interests
+                        and strengths.
+                    </p>
+
+                </div>
+
+
+                <a href="{% url 'career_roadmap' career.name|slugify %}" class="assessment-btn">
+                    Roadmap →
+                </a>
+
+            </div>
+
+
+
+            <!-- ================= BACK BUTTON ================= -->
+
+            <div class="back-section">
+
+                <a href="/explore_careers/" class="back-btn">
+                    ← Back to Explore Careers
+                </a>
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <p>
+            © 2026 CareerPath. Build your future with confidence.
+        </p>
+
+    </footer>
+
+
+</body>
+
+</html>

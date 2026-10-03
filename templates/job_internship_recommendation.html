@@ -1,0 +1,441 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Job & Internship Recommendation</title>
+
+    <link rel="stylesheet"
+          href="{% static 'css/job_internship_recommendation.css' %}">
+
+</head>
+
+<body>
+
+<div class="page-wrapper">
+
+    <header class="page-header">
+
+        <div class="header-content">
+
+            <p class="header-label">
+                CAREERPATH
+            </p>
+
+            <h1>
+                💼 Job & Internship Recommendation
+            </h1>
+
+            <p class="header-subtitle">
+                Find opportunities based on your career
+                interests, education and skills.
+            </p>
+
+        </div>
+
+    </header>
+
+
+    <main class="main-container">
+
+        <section class="main-card interest-card">
+
+            <div class="section-icon">
+                🎯
+            </div>
+
+
+            <h2>
+                Tell Us About Your Career Interest
+            </h2>
+
+
+            <p class="section-description">
+                Enter your interest, skills and education
+                so we can analyze your profile dynamically.
+            </p>
+
+
+            <!-- INTEREST -->
+
+            <label
+                for="interestInput"
+                class="input-label">
+
+                Your Interest / Subject
+
+            </label>
+
+
+            <input
+                type="text"
+                id="interestInput"
+                class="interest-input"
+                autocomplete="off">
+
+
+            <div
+                id="interestError"
+                class="error-message">
+            </div>
+
+
+            <!-- SKILLS -->
+
+            <label
+                for="skillsInput"
+                class="input-label">
+
+                Your Skills
+
+            </label>
+
+
+            <input
+                type="text"
+                id="skillsInput"
+                class="interest-input"
+                autocomplete="off">
+
+
+            <div
+                id="skillsError"
+                class="error-message">
+            </div>
+
+
+            <!-- EDUCATION -->
+
+            <label
+                for="educationInput"
+                class="input-label">
+
+                Your Education
+
+            </label>
+
+
+            <input
+                type="text"
+                id="educationInput"
+                class="interest-input"
+                autocomplete="off">
+
+
+            <div
+                id="educationError"
+                class="error-message">
+            </div>
+
+
+            <!-- CONTINUE -->
+
+            <div class="button-container">
+
+                <button
+                    type="button"
+                    id="continueButton"
+                    class="primary-button">
+
+                    Continue →
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- BACK -->
+
+        <div class="back-button-container">
+
+            <a
+                href="/#features"
+                class="back-button">
+
+                ← Back to Features
+
+            </a>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+    // =====================================================
+    // ELEMENTS
+    // =====================================================
+
+    const interestInput =
+        document.getElementById(
+            "interestInput"
+        );
+
+
+    const skillsInput =
+        document.getElementById(
+            "skillsInput"
+        );
+
+
+    const educationInput =
+        document.getElementById(
+            "educationInput"
+        );
+
+
+    const continueButton =
+        document.getElementById(
+            "continueButton"
+        );
+
+
+    const interestError =
+        document.getElementById(
+            "interestError"
+        );
+
+
+    const skillsError =
+        document.getElementById(
+            "skillsError"
+        );
+
+
+    const educationError =
+        document.getElementById(
+            "educationError"
+        );
+
+
+    // =====================================================
+    // CONTINUE TO ANALYSIS
+    // =====================================================
+
+    function continueToAnalysis() {
+
+        const interest =
+            interestInput.value.trim();
+
+
+        const skills =
+            skillsInput.value.trim();
+
+
+        const education =
+            educationInput.value.trim();
+
+
+        // Clear old errors
+
+        interestError.textContent = "";
+
+        skillsError.textContent = "";
+
+        educationError.textContent = "";
+
+
+        // =================================================
+        // INTEREST VALIDATION
+        // =================================================
+
+        if (!interest) {
+
+            interestError.textContent =
+                "Please enter your interest or subject.";
+
+            interestInput.focus();
+
+            return;
+        }
+
+
+        // =================================================
+        // SKILLS VALIDATION
+        // =================================================
+
+        if (!skills) {
+
+            skillsError.textContent =
+                "Please enter your skills.";
+
+            skillsInput.focus();
+
+            return;
+        }
+
+
+        // =================================================
+        // EDUCATION VALIDATION
+        // =================================================
+
+        if (!education) {
+
+            educationError.textContent =
+                "Please enter your education.";
+
+            educationInput.focus();
+
+            return;
+        }
+
+
+        // =================================================
+        // STORE ACTUAL USER INPUT
+        // =================================================
+
+        sessionStorage.setItem(
+            "job_internship_interest",
+            interest
+        );
+
+
+        sessionStorage.setItem(
+            "job_internship_skills",
+            skills
+        );
+
+
+        sessionStorage.setItem(
+            "job_internship_education",
+            education
+        );
+
+
+        // =================================================
+        // GO TO ANALYSIS PAGE
+        // =================================================
+
+        const analysisURL =
+            "{% url 'job_internship_analysis' %}" +
+            "?interest=" +
+            encodeURIComponent(interest) +
+            "&skills=" +
+            encodeURIComponent(skills) +
+            "&education=" +
+            encodeURIComponent(education);
+
+
+        window.location.href =
+            analysisURL;
+    }
+
+
+    // =====================================================
+    // BUTTON
+    // =====================================================
+
+    continueButton.addEventListener(
+        "click",
+        continueToAnalysis
+    );
+
+
+    // =====================================================
+    // ENTER KEY
+    // =====================================================
+
+    interestInput.addEventListener(
+        "keydown",
+        function(event) {
+
+            if (event.key === "Enter") {
+
+                event.preventDefault();
+
+                continueToAnalysis();
+            }
+
+        }
+    );
+
+
+    skillsInput.addEventListener(
+        "keydown",
+        function(event) {
+
+            if (event.key === "Enter") {
+
+                event.preventDefault();
+
+                continueToAnalysis();
+            }
+
+        }
+    );
+
+
+    educationInput.addEventListener(
+        "keydown",
+        function(event) {
+
+            if (event.key === "Enter") {
+
+                event.preventDefault();
+
+                continueToAnalysis();
+            }
+
+        }
+    );
+
+
+    // =====================================================
+    // REMOVE ERROR WHILE TYPING
+    // =====================================================
+
+    interestInput.addEventListener(
+        "input",
+        function() {
+
+            if (interestInput.value.trim()) {
+
+                interestError.textContent = "";
+            }
+
+        }
+    );
+
+
+    skillsInput.addEventListener(
+        "input",
+        function() {
+
+            if (skillsInput.value.trim()) {
+
+                skillsError.textContent = "";
+            }
+
+        }
+    );
+
+
+    educationInput.addEventListener(
+        "input",
+        function() {
+
+            if (educationInput.value.trim()) {
+
+                educationError.textContent = "";
+            }
+
+        }
+    );
+
+</script>
+
+</body>
+
+</html>

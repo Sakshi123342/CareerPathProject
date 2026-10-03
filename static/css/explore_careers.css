@@ -1,0 +1,359 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f8f7ff;
+    color: #292342;
+}
+
+
+/* ================= NAVBAR ================= */
+
+header {
+    height: 75px;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 7%;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #6c3df4;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.logo-icon {
+    width: 42px;
+    height: 42px;
+    background: #eee8ff;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 21px;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+nav a {
+    text-decoration: none;
+    color: #55516d;
+    font-size: 15px;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+nav a:hover {
+    color: #6c3df4;
+}
+
+nav a.active {
+    color: #6c3df4;
+    font-weight: 600;
+}
+
+
+/* ================= MAIN ================= */
+
+main {
+    min-height: calc(100vh - 140px);
+}
+
+.career-section {
+    width: 90%;
+    max-width: 1150px;
+    margin: auto;
+    padding: 65px 0;
+}
+
+
+/* ================= PAGE HEADING ================= */
+
+.page-heading {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.top-label {
+    display: inline-block;
+    background: #eee8ff;
+    color: #6c3df4;
+    padding: 9px 18px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 18px;
+}
+
+.page-heading h1 {
+    font-size: 44px;
+    color: #292342;
+    margin-bottom: 15px;
+}
+
+.page-heading h1 span {
+    color: #6c3df4;
+}
+
+.page-heading p {
+    max-width: 700px;
+    margin: auto;
+    color: #77738a;
+    font-size: 17px;
+    line-height: 1.7;
+}
+
+
+/* ================= CAREER GRID ================= */
+
+.career-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+
+/* ================= CAREER CARD ================= */
+
+.career-card {
+    background: #ffffff;
+    border: 1px solid #eeeaff;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 8px 25px rgba(74, 51, 150, 0.07);
+    transition: 0.3s;
+    display: flex;
+    flex-direction: column;
+    min-height: 350px;
+}
+
+.career-card:hover {
+    transform: translateY(-7px);
+    box-shadow: 0 15px 35px rgba(74, 51, 150, 0.13);
+}
+
+
+/* ================= CAREER ICON ================= */
+
+.career-icon {
+    width: 65px;
+    height: 65px;
+    background: #eee8ff;
+    border-radius: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 31px;
+    margin-bottom: 20px;
+}
+
+
+/* ================= CATEGORY ================= */
+
+.career-category {
+    display: inline-block;
+    width: fit-content;
+    background: #f1edff;
+    color: #6c3df4;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+
+/* ================= CAREER NAME ================= */
+
+.career-card h2 {
+    font-size: 22px;
+    color: #292342;
+    margin-bottom: 12px;
+}
+
+
+/* ================= DESCRIPTION ================= */
+
+.career-card p {
+    color: #77738a;
+    font-size: 14px;
+    line-height: 1.7;
+    margin-bottom: 22px;
+}
+
+
+/* ================= DETAILS BUTTON ================= */
+
+.details-btn {
+    display: inline-block;
+    width: fit-content;
+    margin-top: auto;
+    text-decoration: none;
+    color: #6c3df4;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.details-btn:hover {
+    color: #4f25c9;
+    transform: translateX(4px);
+}
+
+
+/* ================= BOTTOM CTA ================= */
+
+.career-cta {
+    margin-top: 55px;
+    padding: 38px 45px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, #6c3df4, #8259f5);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.career-cta h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.career-cta p {
+    max-width: 650px;
+    font-size: 14px;
+    line-height: 1.7;
+    opacity: 0.9;
+}
+
+
+/* ================= ASSESSMENT BUTTON ================= */
+
+.assessment-btn {
+    flex-shrink: 0;
+    text-decoration: none;
+    background: #ffffff;
+    color: #6c3df4;
+    padding: 14px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.assessment-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+
+/* ================= FOOTER ================= */
+
+footer {
+    height: 65px;
+    background: #ffffff;
+    border-top: 1px solid #eeeaff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #77738a;
+    font-size: 13px;
+}
+
+
+/* ================= TABLET ================= */
+
+@media (max-width: 900px) {
+
+    header {
+        padding: 0 5%;
+    }
+
+    nav {
+        gap: 18px;
+    }
+
+    .career-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .career-cta {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .career-cta p {
+        margin: auto;
+    }
+}
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 600px) {
+
+    header {
+        height: auto;
+        padding: 18px 5%;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    nav {
+        gap: 12px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    nav a {
+        font-size: 13px;
+    }
+
+    .career-section {
+        padding: 40px 0;
+    }
+
+    .page-heading h1 {
+        font-size: 32px;
+    }
+
+    .page-heading p {
+        font-size: 15px;
+    }
+
+    .career-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .career-card {
+        min-height: auto;
+    }
+
+    .career-cta {
+        padding: 30px 22px;
+    }
+
+    .career-cta h2 {
+        font-size: 21px;
+    }
+
+    .assessment-btn {
+        width: 100%;
+        text-align: center;
+    }
+}

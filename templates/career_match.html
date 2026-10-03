@@ -1,0 +1,310 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Career Match | CareerPath</title>
+
+    <link rel="stylesheet" href="{% static 'css/career_match.css' %}">
+
+</head>
+
+<body>
+
+
+    <!-- ================= NAVBAR ================= -->
+
+    <header>
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                🎓
+            </div>
+
+            CareerPath
+
+        </div>
+
+
+        <nav>
+
+            <a href="/">
+                Home
+            </a>
+
+            <a href="/explore_careers/">
+                Explore Careers
+            </a>
+
+            <a href="/work/">
+                How It Works
+            </a>
+
+            <a href="/about/">
+                About Us
+            </a>
+
+        </nav>
+
+    </header>
+
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main>
+
+        <section class="match-section">
+
+
+            <!-- ================= TOP LABEL ================= -->
+
+            <div class="top-label">
+                ✨ Career Analysis Complete
+            </div>
+
+
+
+            <!-- ================= HEADING ================= -->
+
+            <h1>
+                Your <span>Career Match</span>
+            </h1>
+
+
+            <p class="subtitle">
+
+                Based on your interests, strengths and career goals,
+                we found a career path that matches your profile.
+
+            </p>
+
+
+
+            <!-- ================= MATCH CARD ================= -->
+
+            <div class="match-card">
+
+
+                <!-- CAREER ICON -->
+
+                <div class="match-icon">
+                    💼
+                </div>
+
+
+
+                <!-- CAREER INFORMATION -->
+
+                <div class="match-content">
+
+
+                    <p class="match-label">
+                        BEST CAREER MATCH
+                    </p>
+
+
+                    <h2>
+                        {{ career }}
+                    </h2>
+
+
+                    <p class="match-description">
+
+                        This career matches your interests,
+                        strengths and preferred work style.
+
+                    </p>
+
+
+
+                    <!-- ================= SCORE ================= -->
+
+                    <div class="score-section">
+
+
+                        <!-- SCORE CIRCLE -->
+
+                        <div class="score-circle">
+
+                            <strong>
+                                {{ score }}%
+                            </strong>
+
+                            <span>
+                                Match
+                            </span>
+
+                        </div>
+
+
+
+                        <!-- SCORE INFORMATION -->
+
+                        <div class="score-info">
+
+                            <h3>
+                                Excellent Match!
+                            </h3>
+
+
+                            <p>
+
+                                Your profile shows strong compatibility
+                                with this career path.
+
+                            </p>
+
+
+                            <!-- PROGRESS BAR -->
+
+                            <div class="progress-bar">
+
+                                <div class="progress"></div>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- ================= ASSESSMENT SUMMARY ================= -->
+
+            <div class="summary-section">
+
+
+                <h2>
+                    Your Assessment Summary
+                </h2>
+
+
+                <div class="summary-grid">
+
+
+                    <!-- INTEREST -->
+
+                    <div class="summary-card">
+
+                        <div class="summary-icon">
+                            💡
+                        </div>
+
+
+                        <h3>
+                            Interest
+                        </h3>
+
+
+                        <p>
+                            {{ assessment.interest }}
+                        </p>
+
+                    </div>
+
+
+
+                    <!-- STRENGTH -->
+
+                    <div class="summary-card">
+
+                        <div class="summary-icon">
+                            ⭐
+                        </div>
+
+
+                        <h3>
+                            Strength
+                        </h3>
+
+
+                        <p>
+                            {{ assessment.strength }}
+                        </p>
+
+                    </div>
+
+
+
+                    <!-- WORK STYLE -->
+
+                    <div class="summary-card">
+
+                        <div class="summary-icon">
+                            👥
+                        </div>
+
+
+                        <h3>
+                            Work Style
+                        </h3>
+
+
+                        <p>
+                            {{ assessment.work_style }}
+                        </p>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- ================= NEXT STEP ================= -->
+
+            <div class="next-section">
+
+                <h2>What's Next?</h2>
+
+                <p>
+                    Explore your recommended career, compare career
+                    options and discover the skills you need to build
+                    your future.
+                </p>
+
+                <a href="/career_details/{{ career|slugify }}/" class="explore-btn">
+                    Explore Career Details →
+                </a>
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <p>
+            © 2026 CareerPath. Build your future with confidence.
+        </p>
+
+    </footer>
+
+
+</body>
+
+</html>

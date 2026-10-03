@@ -1,0 +1,1378 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Mock Interview | CareerPath</title>
+
+    <link rel="stylesheet" href="{% static 'css/mock_interview.css' %}">
+
+</head>
+
+
+<body>
+
+
+    <h1>AI Mock Interview</h1>
+
+    <p>
+        Practice your interview with AI and improve your skills.
+    </p>
+
+
+    <div class="interview-container">
+
+
+        <!-- ==================================================
+             INTERVIEW SETTINGS
+        =================================================== -->
+
+        <div class="interview-settings">
+
+
+            <label for="subject">
+                Subject / Technology
+            </label>
+
+
+            <input type="text" id="subject"
+                placeholder="Enter your subject, e.g. Python, Java, SQL, React, AI/ML, Django..." required>
+
+
+            <label for="level">
+                Interview Level
+            </label>
+
+
+            <select id="level" required>
+
+                <option value="">
+                    Choose a level
+                </option>
+
+                <option value="Fresher">
+                    Fresher
+                </option>
+
+                <option value="Beginner">
+                    Beginner
+                </option>
+
+                <option value="Intermediate">
+                    Intermediate
+                </option>
+
+                <option value="Experienced">
+                    Experienced
+                </option>
+
+            </select>
+
+
+            <button id="startBtn" type="button">
+
+                Start Interview
+
+            </button>
+
+
+        </div>
+
+
+
+        <!-- ==================================================
+             CHAT BOX
+        =================================================== -->
+
+        <div id="chatBox" class="chat-box">
+
+            <p class="welcome-message">
+
+                Enter your subject, select your level,
+                and start the interview.
+
+            </p>
+
+        </div>
+
+
+
+        <!-- ==================================================
+             ANSWER FORM
+        =================================================== -->
+
+        <form id="answerForm">
+
+
+            <button type="button" id="micBtn" disabled>
+
+                🎤 Start Speaking
+
+            </button>
+
+
+            <textarea 
+                 id="answerInput" 
+                 placeholder="Type your answer here..."
+                 autocomplete="off" 
+                 disabled
+                 rows="3">
+            </textarea>
+
+
+            <button type="submit" id="sendBtn" disabled>
+
+                Send
+
+            </button>
+
+
+        </form>
+
+
+
+        <!-- ==================================================
+             NEXT QUESTION BOX
+        =================================================== -->
+
+        <div id="nextQuestionBox" style="display: none; margin-top: 20px; text-align: center;">
+
+            <p>
+                Would you like the next question?
+            </p>
+
+
+            <button type="button" id="nextYesBtn">
+
+                Yes, Next Question
+
+            </button>
+
+
+            <button type="button" id="nextNoBtn">
+
+                No, End Interview
+
+            </button>
+
+        </div>
+
+
+
+        <!-- ==================================================
+             STATUS
+        =================================================== -->
+
+        <p id="statusMessage"></p>
+
+
+    </div>
+
+
+
+    <!-- ======================================================
+         BACK BUTTON
+    ======================================================= -->
+
+    <div class="back-button-container">
+
+        <a href="/#features" class="back-button">
+
+            ← Back to Features
+
+        </a>
+
+    </div>
+
+
+
+    <script>
+
+
+        // ====================================================
+        // ELEMENTS
+        // ====================================================
+
+        const subjectInput =
+            document.getElementById(
+                "subject"
+            );
+
+
+        const levelSelect =
+            document.getElementById(
+                "level"
+            );
+
+
+        const startBtn =
+            document.getElementById(
+                "startBtn"
+            );
+
+
+        const chatBox =
+            document.getElementById(
+                "chatBox"
+            );
+
+
+        const answerForm =
+            document.getElementById(
+                "answerForm"
+            );
+
+
+        const answerInput =
+            document.getElementById(
+                "answerInput"
+            );
+
+
+        const sendBtn =
+            document.getElementById(
+                "sendBtn"
+            );
+
+
+        const micBtn =
+            document.getElementById(
+                "micBtn"
+            );
+
+
+        const statusMessage =
+            document.getElementById(
+                "statusMessage"
+            );
+
+
+        const nextQuestionBox =
+            document.getElementById(
+                "nextQuestionBox"
+            );
+
+
+        const nextYesBtn =
+            document.getElementById(
+                "nextYesBtn"
+            );
+
+
+        const nextNoBtn =
+            document.getElementById(
+                "nextNoBtn"
+            );
+
+
+
+        // ====================================================
+        // API URL
+        // ====================================================
+
+        const apiUrl =
+            "{% url 'mock_interview_api' %}";
+
+
+
+        // ====================================================
+        // STATE
+        // ====================================================
+
+        let history = [];
+
+        let interviewStarted =
+            false;
+
+        let isWaiting =
+            false;
+
+        let isInterviewEnded =
+            false;
+
+
+
+        // ====================================================
+        // SPEECH RECOGNITION
+        // ====================================================
+
+        const SpeechRecognition =
+            window.SpeechRecognition ||
+            window.webkitSpeechRecognition;
+
+
+        let recognition =
+            null;
+
+
+        let isListening =
+            false;
+
+
+        if (SpeechRecognition) {
+
+
+            recognition =
+                new SpeechRecognition();
+
+
+            recognition.lang =
+                "en-IN";
+
+
+            recognition.continuous =
+                false;
+
+
+            recognition.interimResults =
+                true;
+
+
+
+            recognition.onstart =
+                function () {
+
+                    isListening =
+                        true;
+
+
+                    micBtn.textContent =
+                        "🎤 Listening...";
+
+
+                    statusMessage.textContent =
+                        "Speak your answer...";
+
+                };
+
+
+
+            recognition.onresult =
+                function (event) {
+
+                    let transcript =
+                        "";
+
+
+                    for (
+                        let i =
+                            event.resultIndex;
+
+                        i <
+                        event.results.length;
+
+                        i++
+
+                    ) {
+
+                        transcript +=
+                            event.results[i][0]
+                                .transcript;
+
+                    }
+
+
+                    answerInput.value =
+                        transcript;
+
+                };
+
+
+
+            recognition.onend =
+                function () {
+
+                    isListening =
+                        false;
+
+
+                    micBtn.textContent =
+                        "🎤 Start Speaking";
+
+
+                    if (!isWaiting) {
+
+                        statusMessage.textContent =
+                            "";
+
+                    }
+
+                };
+
+
+
+            recognition.onerror =
+                function (event) {
+
+                    isListening =
+                        false;
+
+
+                    micBtn.textContent =
+                        "🎤 Start Speaking";
+
+
+                    statusMessage.textContent =
+                        "Mic error: " +
+                        event.error;
+
+                };
+
+        }
+
+
+
+        // ====================================================
+        // ADD CHAT MESSAGE
+        // ====================================================
+
+        function addMessage(
+            sender,
+            message
+        ) {
+
+
+            const messageDiv =
+                document.createElement(
+                    "div"
+                );
+
+
+            messageDiv.className =
+                "chat-message " +
+                sender;
+
+
+            const label =
+                document.createElement(
+                    "strong"
+                );
+
+
+            if (sender === "user") {
+
+                label.textContent =
+                    "You: ";
+
+            }
+
+            else {
+
+                label.textContent =
+                    "AI Interviewer: ";
+
+            }
+
+
+            const text =
+                document.createElement(
+                    "span"
+                );
+
+
+            text.textContent =
+                message;
+
+
+            messageDiv.appendChild(
+                label
+            );
+
+
+            messageDiv.appendChild(
+                text
+            );
+
+
+            chatBox.appendChild(
+                messageDiv
+            );
+
+
+            chatBox.scrollTop =
+                chatBox.scrollHeight;
+
+        }
+
+
+
+        // ====================================================
+        // SHOW QUESTION
+        // ====================================================
+
+        function showQuestion(
+            question
+        ) {
+
+
+            if (!question) {
+
+                return;
+
+            }
+
+
+            addMessage(
+                "assistant",
+                question
+            );
+
+
+            interviewStarted =
+                true;
+
+
+            isInterviewEnded =
+                false;
+
+
+            answerInput.disabled =
+                false;
+
+
+            sendBtn.disabled =
+                false;
+
+
+            micBtn.disabled =
+                !recognition;
+
+
+            nextQuestionBox.style.display =
+                "none";
+
+
+            answerInput.focus();
+
+        }
+
+
+
+        // ====================================================
+        // SHOW NEXT PROMPT
+        // ====================================================
+
+        function showNextPrompt() {
+
+
+            nextQuestionBox.style.display =
+                "block";
+
+
+            answerInput.disabled =
+                true;
+
+
+            sendBtn.disabled =
+                true;
+
+
+            micBtn.disabled =
+                true;
+
+
+            nextYesBtn.disabled =
+                false;
+
+
+            nextNoBtn.disabled =
+                false;
+
+
+            statusMessage.textContent =
+                "";
+
+        }
+
+
+
+        // ====================================================
+        // HIDE NEXT PROMPT
+        // ====================================================
+
+        function hideNextPrompt() {
+
+            nextQuestionBox.style.display =
+                "none";
+
+        }
+
+
+
+        // ====================================================
+        // API CALL
+        // ====================================================
+
+        async function callInterviewAPI(
+            action,
+            message = ""
+        ) {
+
+
+            if (isWaiting) {
+
+                return;
+
+            }
+
+
+            isWaiting =
+                true;
+
+
+            statusMessage.textContent =
+                "AI is thinking...";
+
+
+            startBtn.disabled =
+                true;
+
+
+            sendBtn.disabled =
+                true;
+
+
+            micBtn.disabled =
+                true;
+
+
+            nextYesBtn.disabled =
+                true;
+
+
+            nextNoBtn.disabled =
+                true;
+
+
+            try {
+
+
+                const response =
+                    await fetch(
+                        apiUrl,
+                        {
+
+                            method:
+                                "POST",
+
+                            headers: {
+
+                                "Content-Type":
+                                    "application/json"
+
+                            },
+
+                            body:
+                                JSON.stringify({
+
+                                    subject:
+                                        subjectInput
+                                            .value
+                                            .trim(),
+
+                                    level:
+                                        levelSelect
+                                            .value,
+
+                                    action:
+                                        action,
+
+                                    message:
+                                        message,
+
+                                    history:
+                                        history
+
+                                })
+
+                        }
+                    );
+
+
+                // =================================================
+                // READ RESPONSE SAFELY
+                // =================================================
+
+                const responseText =
+                    await response.text();
+
+
+                let data;
+
+
+                try {
+
+                    data =
+                        JSON.parse(
+                            responseText
+                        );
+
+                }
+
+                catch (error) {
+
+                    console.error(
+                        "Invalid server response:",
+                        responseText
+                    );
+
+
+                    throw new Error(
+                        "Server returned an invalid response."
+                    );
+
+                }
+
+
+
+                // =================================================
+                // NOT LOGGED IN
+                // =================================================
+
+                if (
+                    response.status ===
+                    401
+                ) {
+
+
+                    const registerUrl =
+                        "{% url 'register' %}"
+                        +
+                        "?next="
+                        +
+                        encodeURIComponent(
+                            window.location.pathname
+                        );
+
+
+                    window.location.href =
+                        registerUrl;
+
+
+                    return;
+
+                }
+
+
+
+                // =================================================
+                // API ERROR
+                // =================================================
+
+                if (!response.ok) {
+
+                    throw new Error(
+
+                        data.error ||
+                        "Something went wrong."
+
+                    );
+
+                }
+
+
+
+                // =================================================
+                // START
+                // =================================================
+
+                if (
+                    action === "start"
+                ) {
+
+
+                    if (!data.question) {
+
+                        throw new Error(
+                            "AI did not generate a question."
+                        );
+
+                    }
+
+
+                    history = [];
+
+
+                    history.push({
+
+                        role:
+                            "assistant",
+
+                        content:
+                            data.question
+
+                    });
+
+
+                    hideNextPrompt();
+
+
+                    showQuestion(
+                        data.question
+                    );
+
+
+                    return;
+
+                }
+
+
+
+                // =================================================
+                // NEXT
+                // =================================================
+
+                if (
+                    action === "next"
+                ) {
+
+
+                    if (!data.question) {
+
+                        throw new Error(
+                            "AI did not generate a new question."
+                        );
+
+                    }
+
+
+                    history.push({
+
+                        role:
+                            "assistant",
+
+                        content:
+                            data.question
+
+                    });
+
+
+                    hideNextPrompt();
+
+
+                    showQuestion(
+                        data.question
+                    );
+
+
+                    return;
+
+                }
+
+
+
+                // =================================================
+                // ANSWER
+                // =================================================
+
+                if (
+                    action === "answer"
+                ) {
+
+
+                    if (!data.reply) {
+
+                        throw new Error(
+                            "AI did not return feedback."
+                        );
+
+                    }
+
+
+                    addMessage(
+
+                        "assistant",
+
+                        data.reply
+
+                    );
+
+
+                    history.push({
+
+                        role:
+                            "assistant",
+
+                        content:
+                            data.reply
+
+                    });
+
+
+                    // Disable answer until user
+                    // chooses next or end
+                    answerInput.disabled =
+                        true;
+
+
+                    sendBtn.disabled =
+                        true;
+
+
+                    micBtn.disabled =
+                        true;
+
+
+                    if (
+                        data.ask_next === true
+                    ) {
+
+                        showNextPrompt();
+
+                    }
+
+
+                    return;
+
+                }
+
+
+
+                // =================================================
+                // END
+                // =================================================
+
+                if (
+                    action === "end"
+                ) {
+
+                    isInterviewEnded =
+                        true;
+
+
+                    interviewStarted =
+                        false;
+
+
+                    answerInput.disabled =
+                        true;
+
+
+                    sendBtn.disabled =
+                        true;
+
+
+                    micBtn.disabled =
+                        true;
+
+
+                    hideNextPrompt();
+
+
+                    addMessage(
+
+                        "assistant",
+
+                        "Interview ended. Thank you for practicing with CareerPath."
+
+                    );
+
+
+                    return;
+
+                }
+
+
+            }
+
+
+            catch (error) {
+
+                console.error(
+                    "Mock Interview Error:",
+                    error
+                );
+
+
+                statusMessage.textContent =
+                    error.message;
+
+            }
+
+
+            finally {
+
+                isWaiting =
+                    false;
+
+
+                startBtn.disabled =
+                    false;
+
+
+                if (
+                    !isInterviewEnded &&
+                    !nextQuestionBoxIsVisible()
+                ) {
+
+                    sendBtn.disabled =
+                        !interviewStarted;
+
+                    micBtn.disabled =
+                        !interviewStarted ||
+                        !recognition;
+
+                }
+
+
+                if (
+                    statusMessage.textContent
+                    ===
+                    "AI is thinking..."
+                ) {
+
+                    statusMessage.textContent =
+                        "";
+
+                }
+
+            }
+
+        }
+
+
+
+        // ====================================================
+        // NEXT BOX VISIBILITY
+        // ====================================================
+
+        function nextQuestionBoxIsVisible() {
+
+            return (
+                nextQuestionBox.style.display
+                !==
+                "none"
+            );
+
+        }
+
+
+
+        // ====================================================
+        // START INTERVIEW
+        // ====================================================
+
+        startBtn.addEventListener(
+
+            "click",
+
+            async function () {
+
+
+                const subject =
+                    subjectInput
+                        .value
+                        .trim();
+
+
+                const level =
+                    levelSelect.value;
+
+
+                if (!subject) {
+
+                    statusMessage.textContent =
+                        "Please enter your subject or technology.";
+
+                    subjectInput.focus();
+
+                    return;
+
+                }
+
+
+                if (!level) {
+
+                    statusMessage.textContent =
+                        "Please select your interview level.";
+
+                    levelSelect.focus();
+
+                    return;
+
+                }
+
+
+                if (isWaiting) {
+
+                    return;
+
+                }
+
+
+                // Reset UI
+                history = [];
+
+                interviewStarted =
+                    false;
+
+                isInterviewEnded =
+                    false;
+
+
+                chatBox.innerHTML =
+                    "";
+
+
+                answerInput.value =
+                    "";
+
+
+                hideNextPrompt();
+
+
+                statusMessage.textContent =
+                    "Starting interview...";
+
+
+                await callInterviewAPI(
+                    "start"
+                );
+
+            }
+
+        );
+
+
+
+        // ====================================================
+        // SEND ANSWER
+        // ====================================================
+
+        answerForm.addEventListener(
+
+            "submit",
+
+            async function (event) {
+
+                event.preventDefault();
+
+
+                if (
+                    isWaiting ||
+                    !interviewStarted ||
+                    nextQuestionBoxIsVisible()
+                ) {
+
+                    return;
+
+                }
+
+
+                const answer =
+                    answerInput
+                        .value
+                        .trim();
+
+
+                if (!answer) {
+
+                    statusMessage.textContent =
+                        "Please enter your answer.";
+
+                    answerInput.focus();
+
+                    return;
+
+                }
+
+
+                // Display user answer
+                addMessage(
+                    "user",
+                    answer
+                );
+
+
+                // Save user answer
+                history.push({
+
+                    role:
+                        "user",
+
+                    content:
+                        answer
+
+                });
+
+
+                answerInput.value =
+                    "";
+
+
+                await callInterviewAPI(
+                    "answer",
+                    answer
+                );
+
+            }
+
+        );
+
+
+
+        // ====================================================
+        // YES - NEXT QUESTION
+        // ====================================================
+
+        nextYesBtn.addEventListener(
+
+            "click",
+
+            async function () {
+
+
+                if (
+                    isWaiting ||
+                    !interviewStarted
+                ) {
+
+                    return;
+
+                }
+
+
+                hideNextPrompt();
+
+
+                await callInterviewAPI(
+                    "next"
+                );
+
+            }
+
+        );
+
+
+
+        // ====================================================
+        // NO - END INTERVIEW
+        // ====================================================
+
+        nextNoBtn.addEventListener(
+
+            "click",
+
+            async function () {
+
+
+                if (isWaiting) {
+
+                    return;
+
+                }
+
+
+                hideNextPrompt();
+
+
+                await callInterviewAPI(
+                    "end"
+                );
+
+            }
+
+        );
+
+
+
+        // ====================================================
+        // MICROPHONE
+        // ====================================================
+
+        micBtn.addEventListener(
+
+            "click",
+
+            function () {
+
+
+                if (
+                    !recognition ||
+                    isWaiting ||
+                    !interviewStarted ||
+                    nextQuestionBoxIsVisible()
+                ) {
+
+                    return;
+
+                }
+
+
+                if (isListening) {
+
+                    recognition.stop();
+
+                    return;
+
+                }
+
+
+                answerInput.value =
+                    "";
+
+
+                try {
+
+                    recognition.start();
+
+                }
+
+                catch (error) {
+
+                    statusMessage.textContent =
+                        "Unable to start microphone. Please try again.";
+
+                }
+
+            }
+
+        );
+
+
+
+        // ====================================================
+        // ENTER KEY
+        // ====================================================
+
+        answerInput.addEventListener(
+
+            "keydown",
+
+            function (event) {
+
+
+                if (
+                    event.key === "Enter" && !event.shiftKey
+                ) {
+
+                    event.preventDefault();
+
+                    if (
+                        !sendBtn.disabled &&
+                        !isWaiting
+                    ) {
+
+                        answerForm.requestSubmit();
+
+                    }
+
+                }
+
+            }
+
+        );
+
+
+    </script>
+
+
+</body>
+
+</html>
