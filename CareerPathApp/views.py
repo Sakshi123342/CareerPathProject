@@ -1,3 +1,4 @@
+
 import os
 import json
 import re
@@ -7,6 +8,8 @@ from google import genai
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from django.urls import reverse
 from django.http import JsonResponse
@@ -14,7 +17,6 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import StudentProfile, CareerAssessment
-# from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 # home
@@ -93,10 +95,39 @@ def career_assessment(request):
 
     if request.method == 'POST':
 
+        # ---------------- INTEREST ----------------
+
         interest = request.POST.get("interest")
+
+        if interest == "Other":
+            interest = request.POST.get("other_interest", "").strip()
+
+
+        # ---------------- STRENGTH ----------------
+
         strength = request.POST.get("strength")
+
+        if strength == "Other":
+            strength = request.POST.get("other_strength", "").strip()
+
+
+        # ---------------- WORK STYLE ----------------
+
         work_style = request.POST.get("work_style")
+
+        if work_style == "Other":
+            work_style = request.POST.get("other_work_style", "").strip()
+
+
+        # ---------------- CAREER GOAL ----------------
+
         career_goal = request.POST.get("career_goal")
+
+        if career_goal == "Other":
+            career_goal = request.POST.get("other_career_goal", "").strip()
+
+
+        # ---------------- SAVE ASSESSMENT ----------------
 
         CareerAssessment.objects.update_or_create(
             user=request.user,
@@ -117,39 +148,169 @@ def career_assessment(request):
 
 # career match
 def career_match(request):
-   if not request.user.is_authenticated:
-      return redirect('register')
 
-   assessment=CareerAssessment.objects.get(user=request.user)
+    if not request.user.is_authenticated:
+        return redirect('register')
 
-   career ='Software Developer'
-   score=90
+    try:
+        assessment = CareerAssessment.objects.get(user=request.user)
+    except CareerAssessment.DoesNotExist:
+        return redirect('career_assessment')
 
-   if assessment.interest == 'Data':
-      career ='Data Analyst'
-      score=92
+    # User assessment data
+    interest = assessment.interest
+    strength = assessment.strength
+    work_style = assessment.work_style
+    career_goal = assessment.career_goal
 
-   elif assessment.interest=='Design':
-      career = 'UI/UX Designer'
-      score =89
+    # Gemini API
+    api_key = os.getenv("GEMINI_API_KEY")
 
-   elif assessment.interest == "Business":
-        career = "Business Analyst"
-        score = 88
+    if not api_key:
+        return render(
+            request,
+            'career_match.html',
+            {
+                'career': 'Career Match Unavailable',
+                'score': 0,
+                'assessment': assessment,
+            }
+        )
 
-   elif assessment.interest == "Healthcare":
-        career = "Healthcare Professional"
-        score = 87
+    client = genai.Client(api_key=api_key)
 
-   elif assessment.interest == "Science":
-        career = "Research Scientist"
-        score = 86
+    prompt = f"""
+You are an expert career guidance system.
 
-   elif assessment.interest == "Law":
-        career = "Legal Professional"
-        score = 85
+Analyze the student's profile and recommend the SINGLE BEST career
+that genuinely matches the student's field.
 
-   return render(
+IMPORTANT RULES:
+
+1. The student's INTEREST is the primary field.
+2. The career MUST belong to or be strongly related to the student's
+   interest/field.
+3. NEVER assume the field is Technology.
+4. NEVER automatically recommend Software Developer, Data Analyst,
+   AI Engineer, IT jobs, or other technology careers unless the
+   student's actual interest supports them.
+5. The interest can be ANY field, for example:
+   Cricket, Sports, Biology, Teaching, Finance, Marketing,
+   Fashion, Agriculture, Law, Music, Psychology, Design,
+   Healthcare, Business, Science, Technology, etc.
+6. If the interest is a custom field, generate a career specifically
+   related to that custom field.
+7. Use Strength, Work Style and Career Goal to refine the recommendation.
+8. Do not change the student's field just because a more common career
+   exists.
+9. The recommended career must be realistic for the student's education
+   and profile.
+10. Match score must be between 70 and 98.
+11. Return ONLY valid JSON.
+
+Student Profile:
+
+Interest: {interest}
+Strongest Skill: {strength}
+Work Style: {work_style}
+Career Goal: {career_goal}
+
+Return exactly:
+
+{{
+
+    "career": "single best career name",
+
+    "interest_alignment": "very_strong",
+
+    "strength_alignment": "strong",
+
+    "work_style_alignment": "moderate",
+
+    "career_goal_alignment": "strong"
+
+}}
+
+For each alignment field, use ONLY one of:
+"very_strong", "strong", "moderate", "weak"
+"""
+
+    try:
+
+        response = client.models.generate_content(
+            model="gemini-3.5-flash-lite",
+            contents=prompt,
+            config={
+                "response_mime_type": "application/json"
+            }
+        )
+
+        result = json.loads(response.text)
+
+        career = result.get(
+            "career",
+           f"{interest} Professional"
+        )
+
+        score_map = {
+            "very_strong": {
+                "interest": 40,
+                "strength": 25,
+                "work": 20,
+                "goal": 15
+            },
+            "strong": {
+                "interest": 35,
+                "strength": 20,
+                "work": 15,
+                "goal": 12
+            },
+            "moderate": {
+                "interest": 25,
+                "strength": 15,
+                "work": 10,
+                "goal": 8
+            },
+            "weak": {
+                "interest": 15,
+                "strength": 10,
+                "work": 5,
+                "goal": 5
+            }
+        }
+        interest_level = result.get(
+            "interest_alignment", "moderate"
+        ).lower()
+
+        strength_level = result.get(
+            "strength_alignment", "moderate"
+        ).lower()
+
+        work_level = result.get(
+            "work_style_alignment", "moderate"
+        ).lower()
+
+        goal_level = result.get(
+            "career_goal_alignment", "moderate"
+        ).lower()
+
+        score = (
+            score_map.get(interest_level, score_map["moderate"])["interest"]
+            + score_map.get(strength_level, score_map["moderate"])["strength"]
+            + score_map.get(work_level, score_map["moderate"])["work"]
+            + score_map.get(goal_level, score_map["moderate"])["goal"]
+        )
+
+        score = max(40, min(score, 100))
+    except Exception as e:
+
+        print("Career Match Error:", e)
+
+        # Dynamic fallback
+        career = f"{interest} Professional"
+        score = 80
+
+    return render(
         request,
         'career_match.html',
         {
@@ -228,26 +389,61 @@ def career_details(request, career_name):
         Generate career information for: {career_name}
 
         Return ONLY valid JSON in this structure:
+{{
+    "name": "Career name",
+    "category": "Career category",
+    "icon": "one suitable emoji",
+    "description": "A clear career description in 2-3 sentences",
+    "skills": [
+        "Skill 1",
+        "Skill 2",
+        "Skill 3",
+        "Skill 4",
+        "Skill 5"
+    ],
+    "career_path": [
         {{
-            "name": "Career name",
-            "category": "Career category",
-            "icon": "one suitable emoji",
-            "description": "A clear career description in 2-3 sentences",
-            "skills": [
-                "Skill 1",
-                "Skill 2",
-                "Skill 3",
-                "Skill 4",
-                "Skill 5"
-            ]
+            "title": "Career-specific first stage",
+            "description": "What the student should do at this stage."
+        }},
+        {{
+            "title": "Career-specific second stage",
+            "description": "What the student should do at this stage."
+        }},
+        {{
+            "title": "Career-specific third stage",
+            "description": "What the student should do at this stage."
+        }},
+        {{
+            "title": "Career-specific fourth stage",
+            "description": "What the student should do at this stage."
+        }},
+        {{
+            "title": "Career-specific fifth stage",
+            "description": "What the student should do at this stage."
         }}
+    ]
+}}
+
+The career_path must be specifically designed for the given career.
+
+Do NOT use generic stages such as:
+"Learn Skills", "Build Projects", "Get Experience", "Start Career".
+
+For example, a teacher, fashion designer, cricketer, scientist,
+doctor, lawyer, marketer and software engineer must have different
+career paths.
+
+Make every stage practical and relevant to the specific career.
+
+Do not include markdown or text outside the JSON.
 
         Give realistic, useful information for students.
         Do not include markdown or text outside the JSON.
         """
 
         response = client.models.generate_content(
-            model="gemini-3.6-flash",
+            model="gemini-3.5-flash-lite",
             contents=prompt
         )
 
@@ -367,7 +563,7 @@ def career_roadmap(request, career_name):
         """
 
         response = client.models.generate_content(
-            model="gemini-3.6-flash",
+            model="gemini-3.5-flash-lite",
             contents=prompt
         )
 
@@ -400,267 +596,224 @@ from django.urls import reverse
 def career_chatbot(request):
     return render(request, "career_chatbot.html")
 
+# @login_required(login_url='login')
+# def career_chatbot(request):
+#     return render(request, 'CareerPathApp/career_chatbot.html')
 
 @csrf_exempt
 @require_POST
 def chatbot_api(request):
 
     try:
-
-        # ================= LOGIN / REGISTER CHECK =================
+        # ================= LOGIN CHECK =================
 
         if not request.user.is_authenticated:
-
             return JsonResponse({
                 "error": "Please register or login to use the chatbot.",
                 "redirect_url": reverse("register")
             }, status=401)
 
-
-        # ================= GET REQUEST DATA =================
+        # ================= REQUEST DATA =================
 
         data = json.loads(request.body)
 
         question = data.get("message", "").strip()
-
         history = data.get("history", [])
 
-
-        # ================= QUESTION VALIDATION =================
-
         if not question:
-
-            return JsonResponse(
-                {
-                    "error": "Please enter your question."
-                },
-                status=400
-            )
-
-
-        # ================= HISTORY VALIDATION =================
+            return JsonResponse({
+                "error": "Please enter your question."
+            }, status=400)
 
         if not isinstance(history, list):
-
             history = []
 
-
-        # Keep only latest 10 messages
-
+        # Keep only the latest 10 messages
         history = history[-10:]
-
 
         # ================= GEMINI API KEY =================
 
         api_key = os.getenv("GEMINI_API_KEY")
 
-
         if not api_key:
-
-            return JsonResponse(
-                {
-                    "error": "Gemini API key is not configured."
-                },
-                status=500
-            )
-
+            return JsonResponse({
+                "error": "Gemini API key is not configured."
+            }, status=500)
 
         # ================= GEMINI CLIENT =================
 
-        client = genai.Client(
-            api_key=api_key
-        )
-
+        client = genai.Client(api_key=api_key)
 
         # ================= CONVERSATION HISTORY =================
 
         history_text = ""
 
-
         for item in history:
 
             if not isinstance(item, dict):
-
                 continue
 
-
-            role = item.get(
-                "role",
-                ""
-            )
-
-
-            content = item.get(
-                "content",
-                ""
-            )
-
+            role = item.get("role", "")
+            content = item.get("content", "")
 
             if (
                 role in ["user", "assistant"]
                 and isinstance(content, str)
             ):
+                history_text += f"{role}: {content}\n"
 
-                history_text += (
-                    f"{role}: {content}\n"
-                )
-
-
-        # ================= PROMPT =================
+        # ================= CAREER GUIDANCE PROMPT =================
 
         prompt = f"""
-You are CareerPath's AI Career Assistant.
+You are CareerPath's AI Career Guidance Assistant.
 
-Help students with:
+YOUR MAIN PURPOSE:
+Help students explore, choose, prepare for, and build careers
+in ANY field. You are not limited to technology or IT careers.
 
-- Career guidance
-- Python and Django
-- AI and Machine Learning
-- Skills and courses
-- Resume and interview preparation
-- Jobs and internships
+SUPPORTED CAREER FIELDS INCLUDE, BUT ARE NOT LIMITED TO:
 
-Give clear, practical and helpful answers.
+- Government jobs and competitive exams such as UPSC, MPPSC,
+  SSC, Banking and Railways
+- Teaching, education and academic careers
+- Science, Biology, Biotechnology and Research
+- Healthcare and medical careers
+- Commerce, Accounting, Finance and Economics
+- Business, Management, Marketing and Entrepreneurship
+- Law and legal careers
+- Agriculture and environmental careers
+- Sports, Cricket and physical education
+- Fashion, Interior Design, Graphic Design and Arts
+- Psychology, Social Work and Humanities
+- Technology, Python, Django, AI, Machine Learning and Software
+  Development
+- Any other career or emerging field
 
-Use the previous conversation to understand
-follow-up questions.
+YOUR RESPONSIBILITIES:
 
-If the question is unrelated to careers,
-answer politely and guide the user back
-to career-related topics.
+1. Explain careers, job roles and career options clearly.
+2. Explain educational qualifications, eligibility and entrance exams.
+3. Suggest relevant subjects, skills, courses and certifications.
+4. Provide practical, step-by-step preparation plans and roadmaps.
+5. Help students with college choices, competitive exams, portfolios,
+   internships, job searches and interview preparation.
+6. Help students compare careers fairly when they explicitly ask.
+7. Personalize advice using education, interests and goals when known.
+8. Focus on the specific field mentioned in the student's question.
+9. Never assume every student wants an IT or technology career.
+10. Never compare a career with technology unless the student asks.
+11. Do not invent current exam dates, vacancies, eligibility rules,
+    fees or official requirements.
+12. For government exams, explain the relevant exam, syllabus,
+    eligibility, preparation strategy and official verification sources.
+13. If the student has not provided enough information, give useful
+    general guidance first and ask a relevant follow-up question.
+
+RESPONSE STYLE:
+
+- Use simple, student-friendly language.
+- Give clear, practical and relevant answers.
+- Use headings, numbered steps and bullet points when useful.
+- Answer the current question directly.
+- Use previous conversation when it is relevant to the current question.
+- Do not repeatedly advertise or redirect toward IT careers.
+- If a question is unrelated to careers, answer briefly and politely
+  guide the student back toward learning or career guidance.
+
+IMPORTANT EXAMPLES:
+
+- If asked about UPSC, explain UPSC and its preparation. Do not compare
+  it with technology careers unless explicitly asked.
+- If asked how to become a teacher, explain teaching qualifications,
+  relevant exams and preparation.
+- If asked about Biology careers, focus on Biology-related options.
+- If asked about Fashion Design, explain fashion-related skills,
+  courses and portfolio preparation.
+- If asked about AI/ML, provide relevant AI/ML career guidance.
+
+Use the conversation history to understand follow-up questions.
+Do not treat a new topic as a follow-up unless context supports it.
 
 Previous conversation:
-
 {history_text}
 
 Current user question:
-
 {question}
+
+Now answer the current question directly.
 """
 
-
-        # =====================================================
-        # GEMINI REQUEST WITH RETRY
-        # =====================================================
+        # ================= GEMINI REQUEST WITH RETRY =================
 
         response = None
-
         last_error = None
-
 
         for attempt in range(3):
 
             try:
-
                 print(
                     f"Chatbot Gemini attempt {attempt + 1}"
                 )
 
-
                 response = client.models.generate_content(
-
                     model="gemini-3.5-flash-lite",
-
                     contents=prompt
-
                 )
 
-
-                # Check Gemini response
-
                 if response and response.text:
-
                     print(
                         f"Chatbot Gemini attempt {attempt + 1} successful"
                     )
-
                     break
 
-
-                else:
-
-                    print(
-                        f"Chatbot Gemini attempt {attempt + 1} returned empty response"
-                    )
-
+                print(
+                    f"Chatbot Gemini attempt {attempt + 1} "
+                    "returned empty response"
+                )
 
             except Exception as e:
-
                 last_error = e
-
                 response = None
-
 
                 print(
                     f"Chatbot Gemini attempt {attempt + 1} failed:",
                     e
                 )
 
-
-        # =====================================================
-        # FINAL RESPONSE CHECK
-        # =====================================================
+        # ================= FINAL RESPONSE CHECK =================
 
         if response is None or not response.text:
 
-            print(
-                "Chatbot Gemini final error:",
-                last_error
-            )
+            print("Chatbot Gemini final error:", last_error)
 
-
-            return JsonResponse(
-                {
-                    "error":
-                    "AI is temporarily unavailable. Please try again."
-                },
-                status=503
-            )
-
+            return JsonResponse({
+                "error": "AI is temporarily unavailable. Please try again."
+            }, status=503)
 
         # ================= SUCCESS RESPONSE =================
 
         reply = response.text.strip()
 
-
         return JsonResponse({
             "reply": reply
         })
 
-
-    # =========================================================
-    # INVALID JSON
-    # =========================================================
+    # ================= INVALID JSON =================
 
     except json.JSONDecodeError:
+        return JsonResponse({
+            "error": "Invalid request data."
+        }, status=400)
 
-        return JsonResponse(
-            {
-                "error": "Invalid request data."
-            },
-            status=400
-        )
-
-
-    # =========================================================
-    # OTHER ERRORS
-    # =========================================================
+    # ================= OTHER ERRORS =================
 
     except Exception as e:
+        print("Career Chatbot Error:", e)
 
-        print(
-            "Career Chatbot Error:",
-            e
-        )
+        return JsonResponse({
+            "error": "Unable to generate a response. Please try again."
+        }, status=500)
 
-
-        return JsonResponse(
-            {
-                "error":
-                "Unable to generate a response. Please try again."
-            },
-            status=500
-        )
 
 # AI MOCK INTERVIEW
 def mock_interview(request):
@@ -669,6 +822,9 @@ def mock_interview(request):
         "mock_interview.html"
     )
 
+# @login_required(login_url='login')
+# def mock_interview(request):
+#     return render(request, 'CareerPathApp/mock_interview.html')
 
 # NORMALIZE TEXT
 def normalize_mock_text(text):
@@ -887,28 +1043,52 @@ def generate_new_mock_question(
     )
 
 
+  
     level_rules = {
 
         "Fresher": """
-Basic concepts, fundamentals, simple practical questions,
-basic coding and simple debugging.
-Do not ask advanced, architecture or senior-level questions.
-""",
+          Ask simple, fundamental interview questions suitable
+          for a fresher with little or no professional experience.
 
-        "Beginner": """
-Fundamentals, concept understanding, simple practical
-implementation, easy coding and debugging.
-""",
+    Focus on:
+    - Basic concepts of the selected subject
+    - Definitions and fundamental terminology
+    - Simple differences between concepts
+    - Basic understanding and applications
+    - Easy practical questions
+    - Very simple examples or coding questions,
+      only when relevant to the selected subject
 
-        "Intermediate": """
-Deeper concepts, practical implementation, problem solving,
-debugging and moderate coding.
-""",
+    Questions must be short, clear and beginner-friendly.
+    Do not ask advanced, senior-level or complex questions.
+    Do not assume the candidate belongs to the IT field.
+    """,
 
-        "Experienced": """
-Advanced concepts, complex problem solving, advanced
-debugging, architecture, performance and optimization.
-"""
+       "Beginner": """
+    Ask foundational questions to check understanding
+    of the selected subject.
+
+    Include simple practical applications,
+    basic problem-solving and easy examples.
+    Avoid advanced or highly complex questions.
+    """,
+
+       "Intermediate": """
+    Ask moderately challenging questions related to
+    the selected subject.
+
+    Include practical applications, problem-solving,
+    conceptual understanding and relevant debugging
+    or case-based questions where appropriate.
+    """,
+
+       "Experienced": """
+    Ask advanced professional questions relevant to
+    the selected subject and experience level.
+ 
+    Include complex problem-solving, real-world scenarios,
+    decision-making and advanced concepts where relevant.
+    """
     }
 
 
@@ -967,55 +1147,69 @@ PREVIOUSLY COVERED CONCEPTS:
 
 IMPORTANT RULES:
 
-1. The user's subject is the PRIMARY topic.
+1. The selected subject or field is the single source
+   of truth for generating interview questions.
 
-2. The subject can be any technical field.
+2. Support any technical or non-technical subject,
+   including programming, science, education, business,
+   design, healthcare and other professional fields.
 
-3. Stay strictly relevant to the subject.
+3. Stay strictly relevant to the selected subject.
 
-4. Follow the selected interview level strictly.
+4. Follow the selected interview level and LEVEL RULES.
 
-5. Generate exactly ONE question.
+5. Generate exactly ONE interview question.
 
 6. Never repeat a previous question.
 
-7. Never generate a near-identical question.
+7. Never generate an identical or near-identical question.
 
-8. NEVER use a concept already listed under
+8. Never reuse a concept listed under
    PREVIOUSLY COVERED CONCEPTS.
 
-9. Select a NEW concept.
+9. Select a new, relevant concept for each question.
 
-10. Vary the question type.
+10. Vary the question type when appropriate:
+    Definition, Conceptual, Difference, Why/How,
+    Output-based, Coding, Debugging, Practical or Scenario.
 
-11. Possible question types:
-    - Definition
-    - Conceptual
-    - Difference
-    - Why / How
-    - Output-based
-    - Coding
-    - Debugging
-    - Practical
-    - Scenario
+11. Use only question types appropriate to the
+    selected subject.
 
-12. For Fresher, keep the question basic.
+12. For Fresher, ask simple fundamental questions.
 
-13. For Beginner, keep it foundational.
+13. For Beginner, ask foundational questions.
 
-14. For Intermediate, use moderate problem solving.
+14. For Intermediate, ask moderately challenging questions.
 
-15. For Experienced, use advanced professional questions.
+15. For Experienced, ask advanced professional questions.
 
-16. Do not give the answer.
+16. Do not provide the answer.
 
-17. Do not give hints.
+17. Do not provide hints or explanations.
 
-18. Do not give explanation.
+18. Do not generate multiple questions.
 
-19. Do not generate multiple questions.
+19. The student profile and career context are provided
+    for background only. They must not change the
+    selected subject or determine question examples.
 
-20. Return ONLY JSON.
+20. Do not assume the student belongs to IT or programming.
+
+21. Do not introduce unrelated industries, businesses,
+    products or scenarios into a question.
+
+22. Use practical scenarios only when they are directly
+    relevant to the selected subject.
+
+23. Use coding questions only when coding is relevant
+    to the selected subject.
+
+24. Make every question clear, concise and appropriate
+    for the selected level.
+
+25. Return ONLY valid JSON in the required format.
+
 
 
 Return exactly:
@@ -3427,9 +3621,7 @@ Student Questions and Answers:
             status=500
         )
 
-# ============================================================
 # JOB & INTERNSHIP RECOMMENDATION PAGE
-# ============================================================
 
 def job_internship_recommendation(request):
 
@@ -3440,9 +3632,12 @@ def job_internship_recommendation(request):
         request,
         "job_internship_recommendation.html"
     )
-# ============================================================
 # JOB & INTERNSHIP PROFILE ANALYSIS PAGE
-# ============================================================
+
+# @login_required(login_url='login')
+
+# def career_aptitude_quiz(request):
+#     return render(request, 'CareerPathApp/career_aptitude_quiz.html')
 
 def job_internship_analysis(request):
 
@@ -3455,11 +3650,10 @@ def job_internship_analysis(request):
     )
 @csrf_exempt
 @require_POST
+
 def job_internship_analysis_api(request):
 
-    # ============================================================
     # LOGIN CHECK
-    # ============================================================
 
     if not request.user.is_authenticated:
         return JsonResponse(
@@ -3472,9 +3666,7 @@ def job_internship_analysis_api(request):
 
     try:
 
-        # ========================================================
         # READ REQUEST DATA
-        # ========================================================
 
         data = json.loads(request.body)
 
@@ -3625,23 +3817,49 @@ The output must change when:
 1. PROFILE SUMMARY
 ============================================================
 
-Create a concise and factual summary of the student's
-profile using:
+PROFILE SUMMARY
 
-- Education
-- Selected Interest
-- Entered Skills
+Write a concise, professional profile summary based strictly on
+the student's Education, Selected Interest, and Entered Skills.
 
-Do not mention the student's name.
+The summary should:
+- Clearly describe the student's current professional profile.
+- Mention the relevant education background naturally.
+- Mention the selected interest/domain.
+- Highlight the student's existing skills that are relevant to that domain.
+- Show the student's potential career direction.
+- Sound like a professional resume/profile summary.
+- Be specific to the student's actual information.
+- Do NOT add skills that the student did not enter.
+- Do NOT assume a Technology/IT career from MCA or any other education alone.
+- Do NOT use exaggerated claims such as "highly skilled", "expert",
+  "industry-ready", or "experienced" unless explicitly supported.
+- Keep the summary concise: 2–4 professional sentences.
+- Avoid generic or repetitive statements.
 
 ============================================================
 2. INTEREST ALIGNMENT
 ============================================================
 
-Explain how the student's education and entered skills
-align with the selected interest.
+INTEREST ALIGNMENT
 
-The explanation must be specific to the actual input.
+Write a concise, professional explanation of how the student's
+entered skills and selected interest are connected.
+
+The explanation should:
+- Clearly explain the relationship between the student's current
+  skills and selected interest.
+- Mention only skills that the student actually entered.
+- Explain how those skills support the selected interest or career direction.
+- Identify the strength of alignment based on the provided information.
+- Be specific to the student's actual interest and skills.
+- Do NOT add or assume skills that were not entered.
+- Do NOT assume a Technology/IT connection from education alone.
+- Do NOT introduce unrelated professional domains.
+- Do NOT use exaggerated claims such as "perfect match",
+  "excellent expertise", or "guaranteed career".
+- Keep it professional, concise, and realistic.
+- Write 2–3 sentences.
 
 ============================================================
 3. MATCHING SKILLS
@@ -3660,45 +3878,220 @@ entered skills.
 ============================================================
 4. SKILL GAPS
 ============================================================
+Identify only genuinely useful ADDITIONAL skills or competencies
+that are missing from the student's entered skills and would help
+with the selected interest and suitable career direction.
 
-Identify useful skills that are missing from the student's
-entered skills and would help with the selected interest
-and suitable career direction.
+Generate these dynamically based on:
+- Selected Interest
+- Entered Skills
+- Career Direction
 
-Generate these dynamically.
+IMPORTANT RULES:
 
-Do NOT use a fixed list.
-
-Do NOT include skills that are already present in the
-entered skills.
-
-============================================================
-5. CAREER FOCUS
-============================================================
+- Treat all skills entered by the student as already-existing skills.
+- Do NOT include any skill that is already present.
+- Do NOT create a modified version of an existing skill.
+- Do NOT simply add words such as "Technique", "Advanced",
+  "Fundamentals", "Basics", or "Improvement" to an existing skill.
+- For example, if the student has "Batting", do NOT return
+  "Batting Technique".
+- If the student has "Bowling", do NOT return
+  "Bowling Technique".
+- Generate only genuinely NEW skills that complement the
+  student's existing skills.
+- Every skill gap must be directly useful for the selected
+  interest and suitable career direction.
+- Do NOT use a fixed list.
+- Do NOT introduce unrelated domain skills based only on education.
+- Avoid generic filler skills.
+- Return only 3–6 meaningful skill gaps.
+Skill gaps must be based on the student's actual interest and
+existing skills, without assuming a specific profession such as
+coach, trainer, analyst, instructor, or performance specialist
+unless the student's information clearly supports that direction.
+# ============================================================
+# 5. CAREER FOCUS
+# ============================================================
 
 Generate between 3 and 6 suitable career roles.
 
-Career roles must be based on the combination of:
+Career roles must be based on the student's ACTUAL
+selected interest and ACTUAL entered skills.
 
-- Education
-- Selected Interest
-- Entered Skills
+Education is supporting information only.
+Do NOT let education alone determine the career domain.
 
-The roles should be practical and realistic for a
-student/fresher.
+============================================================
+STRICT CAREER DOMAIN RULE
+============================================================
 
-Do NOT simply return the selected interest as a career.
+First identify the domain represented by the student's
+SELECTED INTEREST.
 
-Do NOT always return the same career roles.
+Then verify whether the ENTERED SKILLS actually support
+a career role in that domain.
 
-For example, Python + Django + REST API + SQL may lead
-to roles such as Python Developer, Backend Developer,
-Django Developer, API Developer or Software Engineer.
+A career role must be directly or reasonably supported by
+the student's entered skills.
 
-These are examples only.
+Do NOT introduce a completely new professional domain
+only because it is commonly associated with the interest.
 
-For other interests and skills, generate different
-appropriate career roles.
+============================================================
+IMPORTANT EXAMPLES
+============================================================
+
+Example 1:
+
+Education:
+MCA
+
+Interest:
+Cricket
+
+Skills:
+Bowling, Batting
+
+Suitable career direction may include roles related to:
+
+- Cricket Coaching
+- Bowling Coaching
+- Batting Coaching
+- Cricket Training
+- Cricket Performance
+
+Do NOT automatically introduce:
+
+- Data Analyst
+- Sports Data Analyst
+- Data Scientist
+- Software Developer
+- Python Developer
+- IT Analyst
+
+because the student did NOT enter data, analytics,
+programming or software-related skills.
+
+------------------------------------------------------------
+
+Example 2:
+
+Education:
+MCA
+
+Interest:
+Biology
+
+Skills:
+Biology, Research
+
+Suitable career direction may include roles related to:
+
+- Biological Research
+- Laboratory Research
+- Life Sciences Research
+- Biology Research Assistance
+- Scientific Research
+
+Do NOT automatically introduce Software Developer,
+Python Developer or Data Analyst unless the student's
+entered skills actually support those roles.
+
+------------------------------------------------------------
+
+Example 3:
+
+Education:
+BCom
+
+Interest:
+Finance
+
+Skills:
+Accounting, Excel, Financial Analysis
+
+Finance and accounting-related career roles are
+appropriate because the entered skills support them.
+
+------------------------------------------------------------
+
+Example 4:
+
+Education:
+MCA
+
+Interest:
+Python Development
+
+Skills:
+Python, Django, SQL
+
+Technology-related career roles are appropriate because
+the student's actual interest and skills support Technology.
+
+============================================================
+STRICT RULES
+============================================================
+
+1. Do NOT use a fixed career list.
+
+2. Do NOT assume Technology is the default domain.
+
+3. Do NOT assume MCA means Technology.
+
+4. Do NOT assume BSc means Science-related career.
+
+5. Do NOT assume BCom means Accounting.
+
+6. Do NOT assume BA means Arts-related career.
+
+7. Do NOT introduce Data/Analytics roles unless the entered
+   skills actually contain relevant data/analytics abilities.
+
+8. Do NOT introduce Programming/IT roles unless the entered
+   skills actually contain relevant programming/IT abilities.
+
+9. Do NOT introduce Management roles unless the entered
+   interest and skills support management.
+
+10. Do NOT introduce Research roles unless the entered
+    interest or skills support research.
+
+11. Do NOT introduce a new technical field merely because
+    the student's education is MCA, BCA, CS or another
+    technology-related degree.
+
+12. The student's entered skills are the strongest evidence
+    for deciding whether a specific career role is suitable.
+
+13. Do NOT invent skills that the student did not enter.
+
+14. Do NOT recommend a role that requires a completely
+    different skill domain from the student's entered skills.
+
+15. Career roles must change when the student's interest
+    or skills change.
+
+16. Keep recommendations realistic for a student/fresher.
+
+17. Do NOT simply return the selected interest as a career.
+
+18. Do NOT repeat the same career roles for every student.
+
+============================================================
+FINAL VALIDATION BEFORE OUTPUT
+============================================================
+
+Before returning each career role, verify:
+
+- Is it related to the selected interest?
+- Is it supported by the entered skills?
+- Does it avoid introducing an unrelated domain?
+- Is it reasonable for a student/fresher?
+
+If a career role fails any of these checks,
+DO NOT include it.
 
 ============================================================
 IMPORTANT
@@ -3991,6 +4384,391 @@ Use exactly this structure:
             {
                 "success": False,
                 "message": str(e)
+            },
+            status=500
+        )
+
+    # JOb Internship Opportunity 
+
+def job_internship_opportunity(request):
+
+    if not request.user.is_authenticated:
+        return redirect("login")
+
+    return render(
+        request,
+        "job_internship_opportunity.html"
+    )
+# API
+def job_internship_opportunity_api(request):
+
+    if not request.user.is_authenticated:
+        return JsonResponse(
+            {
+                "success": False,
+                "error": "Login required."
+            },
+            status=401
+        )
+
+    if request.method != "POST":
+        return JsonResponse(
+            {
+                "success": False,
+                "error": "POST request required."
+            },
+            status=405
+        )
+
+    try:
+        data = json.loads(request.body)
+
+        interest = data.get("interest", "").strip()
+        skills = data.get("skills", "").strip()
+        education = data.get("education", "").strip()
+        experience = data.get("experience", "").strip()
+
+        if not interest:
+            return JsonResponse(
+                {
+                    "success": False,
+                    "error": "Interest is required."
+                },
+                status=400
+            )
+
+        if not skills:
+            return JsonResponse(
+                {
+                    "success": False,
+                    "error": "Skills are required."
+                },
+                status=400
+            )
+
+        if not education:
+            return JsonResponse(
+                {
+                    "success": False,
+                    "error": "Education is required."
+                },
+                status=400
+            )
+
+        api_key = os.getenv("GEMINI_API_KEY")
+
+        if not api_key:
+            return JsonResponse(
+                {
+                    "success": False,
+                    "error": "Gemini API key not configured."
+                },
+                status=500
+            )
+
+        client = genai.Client(api_key=api_key)
+
+        prompt = f"""
+You are an intelligent AI career opportunity recommendation system.
+
+Your task is to generate dynamic job and internship opportunities
+ONLY from the user's actual profile.
+
+USER PROFILE:
+
+Interest:
+{interest}
+
+Skills:
+{skills}
+
+Education:
+{education}
+
+Experience:
+{experience}
+
+CORE RULE:
+
+The user's Interest, Skills, and Education are the ONLY source
+for deciding suitable opportunities.
+
+Every time the input changes, the recommended opportunities
+MUST change accordingly.
+
+Do NOT use fixed, predefined, or previously generated opportunities.
+
+
+FIELD-AGNOSTIC REQUIREMENT:
+
+The system must work for ANY career field.
+
+Do NOT assume:
+- Technology
+- IT
+- Software
+- Python
+- Computer Science
+- Web Development
+
+unless these are actually present in the user's Interest or Skills.
+
+
+INTEREST RULE:
+
+Interest is the PRIMARY factor for selecting the opportunity domain.
+
+Skills are used to determine whether the user matches that opportunity.
+
+Education is used mainly for eligibility.
+
+Do NOT generate an opportunity only because of the education.
+
+
+EXAMPLES:
+
+If:
+
+Interest = Cricket
+Skills = Batting, Bowling, Fitness
+Education = MCA
+
+Then recommend cricket/sports-related opportunities.
+
+Do NOT recommend:
+Python Developer
+Backend Developer
+Software Developer
+Web Developer
+
+
+If:
+
+Interest = Biology
+Skills = Research, Laboratory, Biology
+Education = B.Sc Biology
+
+Then recommend biology/life-science/research-related opportunities.
+
+
+If:
+
+Interest = Finance
+Skills = Accounting, Excel, Financial Analysis
+Education = B.Com
+
+Then recommend finance/accounting-related opportunities.
+
+
+If:
+
+Interest = Teaching
+Skills = Communication, Mathematics, Presentation
+Education = B.Ed
+
+Then recommend teaching/education-related opportunities.
+
+
+If:
+
+Interest = Python Development
+Skills = Python, Django, SQL, REST API
+Education = MCA
+
+Then recommend Python/backend/software-related opportunities.
+
+
+DYNAMIC OPPORTUNITIES:
+
+Generate as many genuinely relevant opportunities as practical
+for the user's profile.
+
+There is NO fixed number of opportunities.
+Do not limit recommendations to 10.
+
+Return only opportunities that genuinely match the user's
+Interest, Skills, Education, and Experience.
+
+Do NOT generate unrelated opportunities to increase the count.
+
+If only a few relevant opportunities exist, return only those.
+Never assume the user belongs to the IT or technology field.
+
+
+
+Each opportunity must be meaningfully different.
+
+Do not simply change the job title while keeping the same
+description and skills.
+
+
+DYNAMIC DATA:
+
+For EVERY opportunity, dynamically generate:
+
+- title
+- organization
+- type
+- description
+- eligibility
+- required_skills
+- location
+- salary_or_stipend
+- duration
+- deadline
+- match_score
+- match_reason
+- apply_link
+
+
+IMPORTANT FOR OPPORTUNITY DETAILS:
+
+- Every opportunity must have details that are specific to that
+  particular opportunity.
+- Do NOT repeat the same location, salary/stipend, duration,
+  or deadline for every opportunity.
+- These fields must be independently generated according to the
+  opportunity type and domain.
+- If a realistic value cannot be determined, return null.
+- Do not use "Not specified" in the JSON response. Use null instead.
+- Do not invent verified real-world job information.
+- For AI-generated opportunities, clearly treat salary, location,
+  duration and deadline as estimated/example information unless
+  they come from a real provided source.
+  CURRENT DATE RULES:
+
+- The current year is 2026.
+- Never generate a deadline from 2023, 2024, or 2025.
+- Every deadline must be a future date relative to the current date.
+- Since the current date is October 2026, deadlines should be
+  between October 2026 and December 2026.
+- Use realistic future dates only.
+- If a deadline cannot be reasonably determined, return null.
+
+LOCATION RULES:
+
+- Locations must be in India.
+- Prefer Indian cities such as Indore, Bhopal, Pune, Mumbai,
+  Bengaluru, Hyderabad, Delhi, Chennai, Ahmedabad, etc.
+- Do not generate locations outside India.
+- If the opportunity is suitable for remote work, use
+  "Remote - India".
+IMPORTANT:
+
+The following fields MUST also depend on the actual opportunity:
+
+description
+eligibility
+required_skills
+duration
+match_reason
+match_score
+
+Do NOT copy the user's skills blindly into every opportunity.
+
+required_skills must represent skills actually relevant to
+that particular opportunity.
+
+match_score must represent the actual match between:
+
+Interest + Skills + Education
+
+and the generated opportunity.
+
+
+REAL-WORLD DATA SAFETY:
+
+Do not fabricate real companies or organizations.
+
+Do not fabricate real salaries.
+
+Do not fabricate real deadlines.
+
+Do not fabricate application URLs.
+
+If reliable information is unavailable, return null.
+
+apply_link must be null unless a genuine application URL
+is available from the provided information.
+
+These are AI-generated career recommendations and must not
+be presented as verified live job listings.
+
+
+MATCH SCORE:
+
+match_score must be an integer between 0 and 100.
+
+Higher score means stronger alignment with the user's:
+
+Interest + Skills + Education.
+
+
+OUTPUT:
+
+Return ONLY valid JSON.
+
+JSON format:
+
+{{
+    "opportunities": [
+        {{
+            "title": "",
+            "organization": null,
+            "type": "",
+            "description": "",
+            "eligibility": "",
+            "required_skills": [],
+            "location": null,
+            "salary_or_stipend": null,
+            "duration": null,
+            "deadline": null,
+            "match_score": 0,
+            "match_reason": "",
+            "apply_link": null
+        }}
+    ]
+}}
+"""
+
+
+        response = client.models.generate_content(
+            model="gemini-3.5-flash-lite",
+            contents=prompt,
+            config={
+                "response_mime_type": "application/json"
+            }
+        )
+
+        ai_result = json.loads(response.text)
+
+        opportunities = ai_result.get(
+            "opportunities",
+            []
+        )
+
+        return JsonResponse(
+            {
+                "success": True,
+                "interest": interest,
+                "skills": skills,
+                "education": education,
+                "experience": experience,
+                "opportunities": opportunities
+            }
+        )
+
+    except Exception as e:
+
+        print(
+            "Opportunity API Error:",
+            str(e)
+        )
+
+        return JsonResponse(
+            {
+                "success": False,
+                "error": str(e)
             },
             status=500
         )

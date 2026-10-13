@@ -1,359 +1,527 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
 
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Career Assessment - CareerPath</title>
+    <title>Career Assessment | CareerPath</title>
 
-    <link rel="stylesheet" href="{% static 'css/career_assessment.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'css/career_assessment.css' %}">
 
 </head>
+
 
 <body>
 
 
-    <!-- ==================== NAVBAR ==================== -->
+<header class="navbar">
 
-    <header>
+    <div class="logo">
+        🎓 CareerPath
+    </div>
 
-        <div class="logo">
+    <nav>
 
-            <div class="logo-icon">
-                🎓
+        <a href="{% url 'home' %}">
+            Home
+        </a>
+
+    </nav>
+
+</header>
+
+
+
+<main>
+
+    <section class="assessment-section">
+
+        <div class="assessment-container">
+
+
+            <!-- ================= HEADING ================= -->
+
+            <div class="assessment-heading">
+
+                <span class="step-label">
+                    STEP 2 OF 5
+                </span>
+
+                <h1>
+                    Career Assessment
+                </h1>
+
+                <p>
+                    Tell us about your interests, strengths and career goals.
+                    This will help us find careers that match you.
+                </p>
+
             </div>
 
-            CareerPath
-
-        </div>
 
 
-        <nav>
+            <!-- ================= PROGRESS ================= -->
 
-            <a href="/">
-                Home
-            </a>
+            <div class="progress-container">
 
-            <a href="/explore_careers/">
-                Explore Careers
-            </a>
+                <div class="progress-bar">
 
-            <a href="/work/">
-                How It Works
-            </a>
+                    <div class="progress-fill"></div>
 
-            <a href="/about/">
-                About Us
-            </a>
+                </div>
 
-        </nav>
-
-    </header>
+            </div>
 
 
 
-    <!-- ==================== ASSESSMENT ==================== -->
+            <!-- ================= ASSESSMENT CARD ================= -->
 
-    <main>
-
-        <section class="assessment-section">
-
-            <div class="assessment-container">
+            <div class="assessment-card">
 
 
-                <!-- Heading -->
+                <div class="card-header">
 
-                <div class="assessment-heading">
-
-                    <div class="small-label">
-                        🎯 Career Assessment
-                    </div>
-
-                    <h1>
-                        Discover Your <span>Career Direction</span>
-                    </h1>
+                    <h2>
+                        Tell Us About Yourself
+                    </h2>
 
                     <p>
-                        Answer a few questions about your interests,
-                        strengths and goals.
+                        Choose the option that best describes you.
                     </p>
 
                 </div>
 
 
 
-                <!-- Assessment Card -->
+                <form method="POST">
 
-                <div class="assessment-card">
+                    {% csrf_token %}
 
 
-                    <div class="card-header">
 
-                        <h2>
-                            Tell Us About You
-                        </h2>
+                    <!-- ================= INTEREST ================= -->
 
-                        <p>
-                            Your answers will help us find careers
-                            that match your profile.
-                        </p>
+                    <div class="form-group">
+
+                        <label for="interest">
+                            1. What are you most interested in?
+                        </label>
+
+
+                        <select
+                            id="interest"
+                            name="interest"
+                            required>
+
+                            <option value="">
+                                Select your interest
+                            </option>
+
+                            <option value="Technology">
+                                Technology & Computers
+                            </option>
+
+                            <option value="Data">
+                                Data & Analytics
+                            </option>
+
+                            <option value="Design">
+                                Design & Creativity
+                            </option>
+
+                            <option value="Business">
+                                Business & Management
+                            </option>
+
+                            <option value="Healthcare">
+                                Healthcare
+                            </option>
+
+                            <option value="Science">
+                                Science & Research
+                            </option>
+
+                            <option value="Law">
+                                Law & Legal Services
+                            </option>
+
+                            <option value="Other">
+                                Other
+                            </option>
+
+                        </select>
+
+
+
+                        <!-- OTHER INTEREST -->
+
+                        <div
+                            id="other-interest-container"
+                            class="other-input-container"
+                            style="display: none;">
+
+                            <label for="other_interest">
+                                Enter your interest
+                            </label>
+
+                            <input
+                                type="text"
+                                id="other_interest"
+                                name="other_interest"
+                                placeholder="Example: Cricket, Agriculture, Biology...">
+
+                        </div>
 
                     </div>
 
 
 
-                    <form method="POST">
+                    <!-- ================= STRONGEST SKILL ================= -->
 
-                        {% csrf_token %}
+                    <div class="form-group">
+
+                        <label for="strength">
+                            2. What is your strongest skill?
+                        </label>
+
+
+                        <select
+                            id="strength"
+                            name="strength"
+                            required>
+
+                            <option value="">
+                                Select your strongest skill
+                            </option>
+
+                            <option value="Problem Solving">
+                                Problem Solving
+                            </option>
+
+                            <option value="Programming">
+                                Programming
+                            </option>
+
+                            <option value="Communication">
+                                Communication
+                            </option>
+
+                            <option value="Creativity">
+                                Creativity
+                            </option>
+
+                            <option value="Analytical Thinking">
+                                Analytical Thinking
+                            </option>
+
+                            <option value="Leadership">
+                                Leadership
+                            </option>
+
+                            <option value="Teamwork">
+                                Teamwork
+                            </option>
+
+                            <option value="Other">
+                                Other
+                            </option>
+
+                        </select>
 
 
 
-                        <!-- ==================== INTEREST ==================== -->
+                        <!-- OTHER SKILL -->
 
-                        <div class="form-group">
+                        <div
+                            id="other-strength-container"
+                            class="other-input-container"
+                            style="display: none;">
 
-                            <label for="interest">
-                                1. What are you most interested in?
+                            <label for="other_strength">
+                                Enter your strongest skill
                             </label>
 
-                            <select
-                                id="interest"
-                                name="interest"
-                                required
-                            >
-
-                                <option value="">
-                                    Select your interest
-                                </option>
-
-                                <option value="Technology">
-                                    Technology & Computers
-                                </option>
-
-                                <option value="Data">
-                                    Data & Analytics
-                                </option>
-
-                                <option value="Design">
-                                    Design & Creativity
-                                </option>
-
-                                <option value="Business">
-                                    Business & Management
-                                </option>
-
-                                <option value="Healthcare">
-                                    Healthcare
-                                </option>
-
-                                <option value="Science">
-                                    Science & Research
-                                </option>
-
-                                <option value="Law">
-                                    Law & Legal Services
-                                </option>
-
-                            </select>
+                            <input
+                                type="text"
+                                id="other_strength"
+                                name="other_strength"
+                                placeholder="Example: Drawing, Singing, Cricket...">
 
                         </div>
 
+                    </div>
 
 
-                        <!-- ==================== STRENGTH ==================== -->
 
-                        <div class="form-group">
+                    <!-- ================= WORK STYLE ================= -->
 
-                            <label for="strength">
-                                2. What is your strongest skill?
+                    <div class="form-group">
+
+                        <label for="work_style">
+                            3. What is your preferred work style?
+                        </label>
+
+
+                        <select
+                            id="work_style"
+                            name="work_style"
+                            required>
+
+                            <option value="">
+                                Select your preferred work style
+                            </option>
+
+                            <option value="Independent">
+                                Independent
+                            </option>
+
+                            <option value="Team">
+                                Team Based
+                            </option>
+
+                            <option value="Creative">
+                                Creative
+                            </option>
+
+                            <option value="Structured">
+                                Structured
+                            </option>
+
+                            <option value="Leadership">
+                                Leadership
+                            </option>
+
+                            <option value="Other">
+                                Other
+                            </option>
+
+                        </select>
+
+
+
+                        <!-- OTHER WORK STYLE -->
+
+                        <div
+                            id="other-work-style-container"
+                            class="other-input-container"
+                            style="display: none;">
+
+                            <label for="other_work_style">
+                                Enter your preferred work style
                             </label>
 
-                            <select
-                                id="strength"
-                                name="strength"
-                                required
-                            >
-
-                                <option value="">
-                                    Select your strength
-                                </option>
-
-                                <option value="Problem Solving">
-                                    Problem Solving
-                                </option>
-
-                                <option value="Programming">
-                                    Programming
-                                </option>
-
-                                <option value="Communication">
-                                    Communication
-                                </option>
-
-                                <option value="Creativity">
-                                    Creativity
-                                </option>
-
-                                <option value="Analytical Thinking">
-                                    Analytical Thinking
-                                </option>
-
-                                <option value="Leadership">
-                                    Leadership
-                                </option>
-
-                                <option value="Teamwork">
-                                    Teamwork
-                                </option>
-
-                            </select>
+                            <input
+                                type="text"
+                                id="other_work_style"
+                                name="other_work_style"
+                                placeholder="Example: Field Work, Flexible Work...">
 
                         </div>
 
+                    </div>
 
 
-                        <!-- ==================== WORK STYLE ==================== -->
 
-                        <div class="form-group">
+                    <!-- ================= CAREER GOAL ================= -->
 
-                            <label for="work_style">
-                                3. Which work style suits you best?
+                    <div class="form-group">
+
+                        <label for="career_goal">
+                            4. What is your career goal?
+                        </label>
+
+
+                        <select
+                            id="career_goal"
+                            name="career_goal"
+                            required>
+
+                            <option value="">
+                                Select your career goal
+                            </option>
+
+                            <option value="Get a Job">
+                                Get a Job
+                            </option>
+
+                            <option value="Start a Business">
+                                Start a Business
+                            </option>
+
+                            <option value="Become a Specialist">
+                                Become a Specialist
+                            </option>
+
+                            <option value="Research">
+                                Research & Innovation
+                            </option>
+
+                            <option value="Leadership">
+                                Leadership / Management
+                            </option>
+
+                            <option value="Freelancing">
+                                Freelancing
+                            </option>
+
+                            <option value="Other">
+                                Other
+                            </option>
+
+                        </select>
+
+
+
+                        <!-- OTHER CAREER GOAL -->
+
+                        <div
+                            id="other-career-goal-container"
+                            class="other-input-container"
+                            style="display: none;">
+
+                            <label for="other_career_goal">
+                                Enter your career goal
                             </label>
 
-                            <select
-                                id="work_style"
-                                name="work_style"
-                                required
-                            >
-
-                                <option value="">
-                                    Select your work style
-                                </option>
-
-                                <option value="Independent">
-                                    Working Independently
-                                </option>
-
-                                <option value="Team">
-                                    Working in a Team
-                                </option>
-
-                                <option value="Creative">
-                                    Creative & Flexible Environment
-                                </option>
-
-                                <option value="Structured">
-                                    Structured & Organized Environment
-                                </option>
-
-                                <option value="Leadership">
-                                    Leading a Team
-                                </option>
-
-                            </select>
+                            <input
+                                type="text"
+                                id="other_career_goal"
+                                name="other_career_goal"
+                                placeholder="Example: Become a professional cricketer...">
 
                         </div>
 
-
-
-                        <!-- ==================== CAREER GOAL ==================== -->
-
-                        <div class="form-group">
-
-                            <label for="career_goal">
-                                4. What is your career goal?
-                            </label>
-
-                            <textarea
-                                id="career_goal"
-                                name="career_goal"
-                                rows="4"
-                                placeholder="Example: I want to become an AI/ML Engineer..."
-                                required
-                            ></textarea>
-
-                        </div>
+                    </div>
 
 
 
-                        <!-- ==================== BUTTON ==================== -->
+                    <!-- ================= BUTTON ================= -->
+
+                    <div class="button-container">
 
                         <button
                             type="submit"
-                            class="assessment-btn"
-                        >
+                            class="submit-button">
+
                             Complete Assessment →
+
                         </button>
 
-
-                    </form>
-
-
-                </div>
-
-
-
-                <!-- Progress -->
-
-                <div class="assessment-progress">
-
-                    <div class="progress-step completed">
-
-                        <span>✓</span>
-
-                        Profile
-
                     </div>
 
 
-                    <div class="progress-line completed-line"></div>
-
-
-                    <div class="progress-step active">
-
-                        <span>2</span>
-
-                        Assessment
-
-                    </div>
-
-
-                    <div class="progress-line"></div>
-
-
-                    <div class="progress-step">
-
-                        <span>3</span>
-
-                        Career Match
-
-                    </div>
-
-                </div>
-
+                </form>
 
             </div>
 
-        </section>
+        </div>
 
-    </main>
+    </section>
+
+</main>
 
 
 
-    <!-- ==================== FOOTER ==================== -->
+<!-- ================= JAVASCRIPT ================= -->
 
-    <footer>
+<script>
 
-        <p>
-            © 2026 CareerPath. Build your future with confidence.
-        </p>
 
-    </footer>
+function setupOtherOption(
+    selectId,
+    containerId,
+    inputId
+) {
+
+    const select =
+        document.getElementById(selectId);
+
+    const container =
+        document.getElementById(containerId);
+
+    const input =
+        document.getElementById(inputId);
+
+
+    select.addEventListener(
+        "change",
+        function () {
+
+
+            /* ================= OTHER ================= */
+
+            if (this.value === "Other") {
+
+                container.style.display = "block";
+
+                input.required = true;
+
+            }
+
+
+            /* ================= NORMAL OPTION ================= */
+
+            else {
+
+                container.style.display = "none";
+
+                input.required = false;
+
+                input.value = "";
+
+            }
+
+        }
+    );
+
+}
+
+
+
+/* ================= INTEREST ================= */
+
+setupOtherOption(
+    "interest",
+    "other-interest-container",
+    "other_interest"
+);
+
+
+
+/* ================= STRONGEST SKILL ================= */
+
+setupOtherOption(
+    "strength",
+    "other-strength-container",
+    "other_strength"
+);
+
+
+
+/* ================= WORK STYLE ================= */
+
+setupOtherOption(
+    "work_style",
+    "other-work-style-container",
+    "other_work_style"
+);
+
+
+
+/* ================= CAREER GOAL ================= */
+
+setupOtherOption(
+    "career_goal",
+    "other-career-goal-container",
+    "other_career_goal"
+);
+
+
+</script>
 
 
 </body>

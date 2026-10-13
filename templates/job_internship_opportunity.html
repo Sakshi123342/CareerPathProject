@@ -1,0 +1,477 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerPath - Job & Internship Opportunities</title>
+    <link rel="stylesheet" href="{% static 'css/job_internship_opportunity.css' %}">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="logo">🎓 CareerPath</div>
+    </nav>
+
+    <main class="page-container">
+        <section id="opportunity-list-section">
+
+            <div class="page-header">
+                <h1>Job / Internship Opportunities</h1>
+                <p>Explore opportunities based on your saved profile.</p>
+            </div>
+
+            <div id="opportunity-list" class="opportunity-list">
+                <p class="no-opportunities">Preparing recommendations...</p>
+            </div>
+
+        </section>
+
+        <div class="back-container"
+             style="display:flex; justify-content:center; margin-top:24px;">
+
+            <button type="button"
+                    class="back-button"
+                    onclick="window.location.href='{% url 'job_internship_recommendation' %}'">
+                ← Back to Recommendation
+            </button>
+
+        </div>
+    </main>
+
+    <form style="display:none;">
+        {% csrf_token %}
+    </form>
+
+    <script>
+        // GET SAVED PROFILE
+
+        const selectedInterest =
+            sessionStorage.getItem("job_internship_interest") || "";
+
+        const selectedSkills =
+            sessionStorage.getItem("job_internship_skills") || "";
+
+        const selectedEducation =
+            sessionStorage.getItem("job_internship_education") || "";
+
+        const selectedExperience =
+            sessionStorage.getItem("job_internship_experience") || "";
+
+        const opportunityList =
+            document.getElementById("opportunity-list");
+
+
+        // EXPERIENCE LABELS
+
+        const experienceLabels = {
+            "fresher": "Fresher / Student",
+            "internship": "Internship Experience Only",
+            "0-2": "0–2 Years of Professional Experience",
+            "2-5": "2–5 Years of Professional Experience",
+            "5+": "5+ Years of Professional Experience"
+        };
+
+        const experienceSearchTerms = {
+            "fresher": "entry level fresher",
+            "internship": "internship",
+            "0-2": "junior",
+            "2-5": "experienced",
+            "5+": "senior"
+        };
+
+
+        // SAFE HTML
+
+        function escapeHTML(value) {
+            return String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+
+        // SLUGIFY
+
+        function slugify(value) {
+            return String(value || "")
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, "-")
+                .replace(/^-+|-+$/g, "");
+        }
+
+
+        // CALL GEMINI BACKEND API
+
+        async function getDynamicOpportunities() {
+            const csrfInput = document.querySelector(
+                "[name=csrfmiddlewaretoken]"
+            );
+
+            const response = await fetch(
+                "{% url 'job_internship_opportunity_api' %}",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrfInput ? csrfInput.value : ""
+                    },
+                    body: JSON.stringify({
+                        interest: selectedInterest,
+                        skills: selectedSkills,
+                        education: selectedEducation,
+                        experience: selectedExperience
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(
+                    data.error || "Could not load recommendations."
+                );
+            }
+
+            return Array.isArray(data.opportunities)
+                ? data.opportunities
+                : [];
+        }
+
+
+        // BUILD PORTAL SEARCH URL
+
+        function buildSearchUrl(platform, opportunityType, jobTitle = "") {
+            const isInternship = opportunityType === "internship";
+
+            const keywords = [
+                jobTitle,
+                selectedInterest,
+                selectedSkills.replace(/[,;\n]+/g, " "),
+                experienceSearchTerms[selectedExperience] || ""
+            ]
+                .map(value => String(value || "").trim())
+                .filter(Boolean)
+                .join(" ")
+                .replace(/\s+/g, " ")
+                .trim();
+
+            const query = [
+                keywords,
+                isInternship ? "internship" : "job",
+                "India"
+            ].filter(Boolean).join(" ");
+
+            if (platform === "LinkedIn") {
+                const params = new URLSearchParams();
+
+                params.set("keywords", query || "jobs India");
+                params.set("location", "India");
+
+                if (isInternship) {
+                    params.set("f_JT", "I");
+                }
+
+                return "https://www.linkedin.com/jobs/search/?" +
+                    params.toString();
+            }
+
+            if (platform === "Indeed") {
+                const params = new URLSearchParams();
+
+                params.set("q", query || "jobs India");
+                params.set("l", "India");
+
+                if (isInternship) {
+                    params.set("jt", "internship");
+                }
+
+                return "https://in.indeed.com/jobs?" +
+                    params.toString();
+            }
+
+            if (platform === "Naukri") {
+                const slug = slugify(
+                    [jobTitle, selectedInterest, selectedSkills]
+                        .filter(Boolean)
+                        .join(" ")
+                );
+
+                return "https://www.naukri.com/" +
+                    (slug || "jobs") + "-jobs";
+            }
+
+            if (platform === "Internshala") {
+                const slug = slugify(
+                    [jobTitle, selectedInterest, selectedSkills]
+                        .filter(Boolean)
+                        .join(" ")
+                );
+
+                return "https://internshala.com/internships/" +
+                    (slug || "internship") + "-internship/";
+            }
+
+            const params = new URLSearchParams();
+            params.set("keywords", query || "jobs India");
+            params.set("location", "India");
+
+            return "https://www.linkedin.com/jobs/search/?" +
+                params.toString();
+        }
+
+
+        // PORTAL CONFIGURATION
+
+        function getPortalOptions() {
+            const jobOptions = [
+                {
+                    platform: "LinkedIn",
+                    title: "Jobs on LinkedIn",
+                    type: "Job Search",
+                    description: "Explore jobs related to your profile.",
+                    opportunityType: "job"
+                },
+                {
+                    platform: "Naukri",
+                    title: "Jobs on Naukri",
+                    type: "Job Search",
+                    description: "Find relevant jobs on Naukri.",
+                    opportunityType: "job"
+                },
+                {
+                    platform: "Indeed",
+                    title: "Jobs on Indeed India",
+                    type: "Job Search",
+                    description: "Search jobs matching your profile.",
+                    opportunityType: "job"
+                }
+            ];
+
+            const internshipOptions = [
+                {
+                    platform: "LinkedIn",
+                    title: "Internships on LinkedIn",
+                    type: "Internship Search",
+                    description: "Explore internships related to your profile.",
+                    opportunityType: "internship"
+                },
+                {
+                    platform: "Indeed",
+                    title: "Internships on Indeed India",
+                    type: "Internship Search",
+                    description: "Search relevant internships on Indeed.",
+                    opportunityType: "internship"
+                },
+                {
+                    platform: "Internshala",
+                    title: "Internships on Internshala",
+                    type: "Internship Search",
+                    description: "Find internships related to your profile.",
+                    opportunityType: "internship"
+                }
+            ];
+
+            if (
+                selectedExperience === "fresher" ||
+                selectedExperience === "internship"
+            ) {
+                return [...jobOptions, ...internshipOptions];
+            }
+
+            return jobOptions;
+        }
+
+
+        // FILTER GENERATED OPPORTUNITIES
+
+        function getDynamicPortalOptions(opportunities) {
+            const portals = getPortalOptions();
+
+            return portals.map(function (option) {
+                const matchingOpportunities = opportunities.filter(
+                    function (item) {
+                        const type = String(item.type || "").toLowerCase();
+                        const isInternship = type.includes("internship");
+
+                        return option.opportunityType === "internship"
+                            ? isInternship
+                            : !isInternship;
+                    }
+                );
+
+                return {
+                    ...option,
+                    opportunities: matchingOpportunities
+                };
+            });
+        }
+
+
+        // RENDER PORTAL CARDS
+
+        async function renderPortalCards() {
+            if (
+                !selectedInterest ||
+                !selectedSkills ||
+                !selectedEducation ||
+                !selectedExperience
+            ) {
+                opportunityList.innerHTML = `
+                    <p class="no-opportunities">
+                        Your saved profile information is incomplete.
+                        Please return to the recommendation page and enter
+                        Interest, Skills, Education and Experience Level.
+                    </p>
+                `;
+                return;
+            }
+
+            opportunityList.innerHTML = `
+                <p class="no-opportunities">
+                    Generating relevant opportunities for your profile...
+                </p>
+            `;
+
+            try {
+                const opportunities = await getDynamicOpportunities();
+
+                opportunityList.innerHTML = `
+                    <div class="profile-search-summary"
+                         style="grid-column:1/-1; margin-bottom:8px;
+                                padding:16px; border:1px solid #e7ddf4;
+                                border-radius:14px; background:#faf8fd;">
+                        <strong>Recommendations based on your profile</strong>
+                        <p style="margin-top:8px; line-height:1.7;">
+                            <b>Interest:</b> ${escapeHTML(selectedInterest)}<br>
+                            <b>Skills:</b> ${escapeHTML(selectedSkills)}<br>
+                            <b>Education:</b> ${escapeHTML(selectedEducation)}<br>
+                            <b>Experience:</b> ${escapeHTML(
+                                experienceLabels[selectedExperience] ||
+                                selectedExperience
+                            )}
+                        </p>
+                    </div>
+                `;
+
+                if (!opportunities.length) {
+                    opportunityList.innerHTML += `
+                        <p class="no-opportunities">
+                            No relevant opportunities were generated.
+                            Try updating your profile details.
+                        </p>
+                    `;
+                    return;
+                }
+
+                const portalOptions =
+                    getDynamicPortalOptions(opportunities);
+
+                portalOptions.forEach(function (option) {
+                    const relevantOpportunities = option.opportunities;
+
+                    if (!relevantOpportunities.length) {
+                        return;
+                    }
+
+                    relevantOpportunities.forEach(function (item) {
+                        const card = document.createElement("div");
+                        card.className = "opportunity-option-card";
+
+                        const title = String(item.title || "").trim();
+
+                        card.innerHTML = `
+                            <span class="card-type">
+                                ${escapeHTML(option.type)}
+                            </span>
+
+                            <h2 class="card-title">
+                                ${escapeHTML(title || option.title)}
+                            </h2>
+
+                            <p style="margin:10px 0; line-height:1.6;">
+                                ${escapeHTML(item.description || option.description)}
+                            </p>
+
+                            <p style="margin:8px 0; line-height:1.6;">
+                                <b>Required skills:</b>
+                                ${escapeHTML(
+                                    Array.isArray(item.required_skills)
+                                        ? item.required_skills.join(", ")
+                                        : ""
+                                )}
+                            </p>
+
+                            <p style="margin:8px 0; line-height:1.6;">
+                                <b>Match score:</b>
+                                ${escapeHTML(item.match_score ?? "N/A")}%
+                            </p>
+
+                            <div class="card-bottom">
+                                <span class="card-match">${escapeHTML(option.platform)}</span>
+                                <button type="button" class="view-details-button">
+                                    Search this role →
+                                </button>
+                            </div>
+                        `;
+
+                        card.querySelector(
+                            ".view-details-button"
+                        ).addEventListener("click", function () {
+                            const targetUrl = buildSearchUrl(
+                                option.platform,
+                                option.opportunityType,
+                                title
+                            );
+
+                            window.open(
+                                targetUrl,
+                                "_blank",
+                                "noopener,noreferrer"
+                            );
+                        });
+
+                        opportunityList.appendChild(card);
+                    });
+                });
+
+                if (
+                    !opportunityList.querySelector(".opportunity-option-card")
+                ) {
+                    opportunityList.innerHTML += `
+                        <p class="no-opportunities">
+                            Gemini returned opportunities, but none could be
+                            classified as jobs or internships. Check the
+                            opportunity "type" values in your backend prompt.
+                        </p>
+                    `;
+                }
+
+            } catch (error) {
+                console.error("Opportunity loading error:", error);
+
+                opportunityList.innerHTML = `
+                    <p class="no-opportunities">
+                        Could not load recommendations.
+                        ${escapeHTML(error.message)}
+                        <br><br>
+                        Please check your login session and try again.
+                    </p>
+                `;
+            }
+        }
+
+
+        // LOAD RECOMMENDATIONS
+
+        renderPortalCards();
+
+    </script>
+
+</body>
+</html>

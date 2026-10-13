@@ -231,7 +231,7 @@ body {
 
 .skills-display {
 
-    margin-bottom: 0;
+    margin-bottom:0px;
 }
 
 
@@ -420,7 +420,34 @@ body {
     margin-bottom: 0;
 }
 
+.opportunity-button-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
 
+.opportunity-button {
+    display: inline-block;
+    padding: 12px 22px;
+    background: #ffffff;
+    color: #4f3b78;
+    text-decoration: none;
+    border: 1px solid #d8cbe8;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.opportunity-button:hover {
+    background: #f5f0fb;
+    color: #4f3b78;
+    border-color: #cbb8df;
+}
 /* =========================================================
    BACK BUTTON
    ========================================================= */

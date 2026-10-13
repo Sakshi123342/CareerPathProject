@@ -16,10 +16,8 @@
           href="{% static 'css/career_aptitude_quiz.css' %}">
 
 
-    <!-- ================================================= -->
     <!-- RESULT SPACING -->
-    <!-- ================================================= -->
-
+    
     <style>
 
         .interest-result {
@@ -105,18 +103,11 @@
 
 <div class="quiz-page">
 
-
-    <!-- ================================================= -->
     <!-- ================= QUIZ CONTAINER ================= -->
-    <!-- ================================================= -->
-
+    
     <div class="quiz-container">
 
-
-        <!-- ================================================= -->
         <!-- ================= HEADER ========================= -->
-        <!-- ================================================= -->
-
         <div class="quiz-header">
 
             <div>
@@ -151,11 +142,7 @@
 
         </div>
 
-
-        <!-- ================================================= -->
         <!-- ================= PROGRESS ======================= -->
-        <!-- ================================================= -->
-
         <div class="progress-container">
 
             <div
@@ -165,11 +152,7 @@
 
         </div>
 
-
-        <!-- ================================================= -->
         <!-- ============== INTEREST SECTION ================== -->
-        <!-- ================================================= -->
-
         <div
             id="interestSection"
             class="interest-section">
@@ -215,600 +198,314 @@
 
         </div>
 
-
-        <!-- ================================================= -->
         <!-- ================= LOADING ======================== -->
-        <!-- ================================================= -->
-
         <div
             id="loadingBox"
             class="loading-box"
             style="display: none;">
 
-
             <div class="loader">
             </div>
 
-
             <p id="loadingMessage">
-
                 Preparing your personalized aptitude quiz...
-
             </p>
-
-
         </div>
 
-
-        <!-- ================================================= -->
         <!-- ================= QUIZ CONTENT =================== -->
-        <!-- ================================================= -->
-
         <div
             id="quizContent"
             class="quiz-content"
             style="display: none;">
 
-
             <!-- ================= QUESTION ================= -->
 
             <h2 id="questionText">
-
                 Question will appear here.
-
             </h2>
-
 
             <!-- ================= OPTIONS ================= -->
 
             <div
                 id="optionsContainer"
                 class="options-container">
-
             </div>
 
-
             <!-- ================= ERROR ================= -->
-
             <p
                 id="quizError"
                 class="quiz-error">
-
             </p>
 
-
             <!-- ================= NAVIGATION ================= -->
-
             <div class="navigation-buttons">
 
-
                 <!-- PREVIOUS -->
-
                 <button
                     type="button"
                     id="previousButton"
                     class="quiz-nav-button previous-button"
                     onclick="previousQuestion()"
                     disabled>
-
                     ← Previous
-
                 </button>
 
-
                 <!-- NEXT -->
-
                 <button
                     type="button"
                     id="nextButton"
                     class="quiz-nav-button next-button"
                     onclick="nextQuestion()"
                     disabled>
-
                     Next →
-
                 </button>
-
-
             </div>
-
-
         </div>
 
-
-        <!-- ================================================= -->
         <!-- ================= RESULT ========================= -->
-        <!-- ================================================= -->
-
         <div
             id="resultBox"
             class="result-box"
             style="display: none;">
 
-
             <!-- ================= RESULT ICON ================= -->
-
             <div class="result-icon">
-
                 ✓
-
             </div>
-
 
             <!-- ================= RESULT TITLE ================ -->
-
             <h2>
-
                 Career Aptitude Result
-
             </h2>
 
-
             <!-- ================= RESULT DESCRIPTION ========= -->
-
             <p id="resultText"
                style="margin-bottom: 30px;">
-
                 Your aptitude quiz has been completed
                 based on your selected subject.
-
             </p>
 
-
-            <!-- ================================================= -->
             <!-- ================= INTEREST AREA ================== -->
-            <!-- ================================================= -->
-
             <div class="interest-result">
-
-
                 <strong>
-
                     Interest Area:
-
                 </strong>
-
-
                 <span id="resultInterest">
-
                     -
-
                 </span>
-
-
             </div>
-
-
-            <!-- ================================================= -->
+ 
             <!-- ================= OVERALL SCORE ================= -->
-            <!-- ================================================= -->
-
             <div class="overall-result">
-
-
                 <!-- OVERALL SCORE -->
-
                 <div class="score-item">
-
-
                     <span class="score-label">
-
                         Overall Score
-
                     </span>
-
-
                     <span
                         id="scoreValue"
                         class="score-value">
-
                         0 / 0
-
                     </span>
-
-
                 </div>
 
-
                 <!-- PERCENTAGE -->
-
                 <div class="score-item">
-
-
                     <span class="score-label">
-
                         Percentage
-
                     </span>
-
-
                     <span
                         id="percentageValue"
                         class="score-value">
-
                         0%
-
                     </span>
-
-
                 </div>
-
-
                 <!-- TOTAL QUESTIONS -->
-
                 <div class="score-item">
-
-
                     <span class="score-label">
-
                         Total Questions
-
                     </span>
-
-
                     <span
                         id="totalQuestionsResult"
                         class="score-value">
-
                         0
-
                     </span>
-
-
                 </div>
 
-
                 <!-- CORRECT -->
-
                 <div class="score-item">
-
-
                     <span class="score-label">
-
                         Correct Answers
-
                     </span>
-
-
                     <span
                         id="correctValue"
                         class="score-value">
-
                         0
-
                     </span>
-
-
                 </div>
 
-
                 <!-- WRONG -->
-
                 <div class="score-item">
-
-
-                    <span class="score-label">
-
+                <span class="score-label">
                         Wrong Answers
-
                     </span>
-
-
                     <span
                         id="wrongValue"
                         class="score-value">
-
                         0
-
                     </span>
-
-
                 </div>
-
-
             </div>
 
-
-            <!-- ================================================= -->
             <!-- ================= PERFORMANCE ==================== -->
-            <!-- ================================================= -->
-
             <div
                 id="performanceMessage"
                 class="performance-message">
-
             </div>
 
-
-            <!-- ================================================= -->
             <!-- ================= AI ANALYSIS ==================== -->
-            <!-- ================================================= -->
-
             <div class="ai-result-section">
-
-
                 <!-- ================= OVERALL RESULT ============== -->
-
                 <div class="ai-result-block">
-
-
                     <h3>
-
                         Overall Result
-
                     </h3>
-
-
                     <p id="overallResult">
-
                         -
-
                     </p>
-
-
                 </div>
-
 
                 <!-- ================= STRENGTHS =================== -->
-
                 <div class="ai-result-block">
-
-
                     <h3>
-
                         Your Strengths
-
                     </h3>
-
-
                     <div id="strengthsResult">
-
                     </div>
-
-
                 </div>
-
 
                 <!-- ================= INTERESTS =================== -->
-
                 <div class="ai-result-block">
-
-
                     <h3>
-
                         Your Interests
-
                     </h3>
-
-
                     <div id="interestsResult">
-
                     </div>
-
-
                 </div>
-
 
                 <!-- ================= CAREER AREAS ================ -->
-
                 <div class="ai-result-block">
-
-
                     <h3>
-
                         Suitable Career Areas
-
                     </h3>
-
-
                     <div id="careerAreasResult">
-
                     </div>
-
-
                 </div>
-
 
                 <!-- ================= ANALYSIS ==================== -->
-
                 <div class="ai-result-block">
-
-
                     <h3>
-
                         Overall Analysis
-
                     </h3>
-
-
                     <p id="analysisResult">
-
                         -
-
                     </p>
-
-
                 </div>
-
-
             </div>
 
-
-            <!-- ================================================= -->
             <!-- ================= QUESTION RESULT ================= -->
-            <!-- ================================================= -->
-
             <div
                 class="ai-result-block"
                 style="margin-top: 10px;">
-
-
                 <h3>
-
                     Question-wise Result
-
                 </h3>
-
-
                 <div
                     id="questionResults"
                     class="question-results">
-
                 </div>
-
-
             </div>
 
-
-            <!-- ================================================= -->
             <!-- ================= RESULT ACTION ================== -->
-            <!-- ================================================= -->
-
             <div class="result-actions">
-
-
                 <button
                     type="button"
                     class="restart-button"
                     onclick="restartQuiz()">
-
                     Take Quiz Again
-
                 </button>
-
-
             </div>
-
-
         </div>
-
-
     </div>
 
-
-    <!-- ================================================= -->
     <!-- ================= BACK BUTTON ==================== -->
-    <!-- ================================================= -->
-
     <div class="back-button-container">
-
-
         <a
             href="/#features"
             class="back-button">
-
             ← Back to Features
-
         </a>
-
-
     </div>
-
-
 </div>
 
-
-<!-- ========================================================= -->
 <!-- ======================== JAVASCRIPT ===================== -->
-<!-- ========================================================= -->
 
 <script>
-
-
-/* =========================================================
-   GLOBAL VARIABLES
-========================================================= */
+//    GLOBAL VARIABLES
 
 let questions = [];
-
 let currentQuestionIndex = 0;
-
 let answers = [];
-
 let selectedAnswer = null;
-
 let quizLoaded = false;
-
 let quizFinished = false;
-
 let userInterest = "";
 
-
-/* =========================================================
-   PAGE LOAD
-========================================================= */
-
+//    PAGE LOAD
+ 
 document.addEventListener(
     "DOMContentLoaded",
     function () {
-
         showLoading(false);
-
     }
 );
 
-
-/* =========================================================
-   START QUIZ
-========================================================= */
-
+// START QUIZ
 async function startQuiz() {
-
-
     const input =
         document.getElementById(
             "interestInput"
         );
-
-
     const error =
         document.getElementById(
             "interestError"
         );
-
-
     userInterest =
         input.value.trim();
-
 
     /* ================= VALIDATION ================= */
 
     if (!userInterest) {
-
         error.textContent =
             "Please enter your subject, field, or interest.";
-
         input.focus();
-
         return;
-
     }
 
-
     /* ================= RESET ================= */
-
     error.textContent = "";
-
     questions = [];
-
     answers = [];
-
     currentQuestionIndex = 0;
-
     selectedAnswer = null;
-
     quizLoaded = false;
-
     quizFinished = false;
 
-
     /* ================= HIDE RESULT ================= */
-
     document.getElementById(
         "resultBox"
     ).style.display =
         "none";
-
 
     /* ================= HIDE INTEREST ================= */
 
@@ -817,35 +514,22 @@ async function startQuiz() {
     ).style.display =
         "none";
 
-
     /* ================= LOAD QUIZ ================= */
-
     await loadQuiz();
-
 }
 
-
-/* =========================================================
-   LOAD QUIZ
-========================================================= */
-
+//    LOAD QUIZ
 async function loadQuiz() {
-
-
     showLoading(
         true,
         "Preparing your personalized aptitude quiz..."
     );
 
-
     try {
-
-
         const response =
             await fetch(
                 "{% url 'career_aptitude_api' %}",
                 {
-
                     method: "POST",
 
                     headers: {
@@ -854,29 +538,20 @@ async function loadQuiz() {
                             "application/json"
 
                     },
-
-
                     body:
                         JSON.stringify({
-
                             action:
                                 "generate",
-
                             subject:
                                 userInterest,
-
                             interest:
                                 userInterest
-
                         })
-
                 }
             );
 
-
         const data =
             await response.json();
-
 
         /* ================= LOGIN ================= */
 
@@ -884,20 +559,15 @@ async function loadQuiz() {
             response.status === 401
         ) {
 
-
             if (
                 data.redirect_url
             ) {
 
                 window.location.href =
                     data.redirect_url;
-
                 return;
-
             }
-
         }
-
 
         /* ================= API ERROR ================= */
 
@@ -909,9 +579,7 @@ async function loadQuiz() {
                 data.error ||
                 "Unable to load the aptitude quiz."
             );
-
         }
-
 
         /* ================= VALIDATE QUESTIONS ================= */
 
@@ -929,10 +597,7 @@ async function loadQuiz() {
 
         }
 
-
-        /* =================================================
-           USE MAXIMUM 10 QUESTIONS
-        ================================================= */
+        //    USE MAXIMUM 10 QUESTIONS
 
         questions =
             data.questions.slice(
@@ -942,7 +607,6 @@ async function loadQuiz() {
 
 
         /* ================= RESET ANSWERS ================= */
-
         answers =
             new Array(
                 questions.length
@@ -1023,9 +687,7 @@ async function loadQuiz() {
 }
 
 
-/* =========================================================
-   SHOW CURRENT QUESTION
-========================================================= */
+//    SHOW CURRENT QUESTION
 
 function showQuestion() {
 
@@ -1133,10 +795,7 @@ function showQuestion() {
 
 }
 
-
-/* =========================================================
-   RENDER OPTIONS
-========================================================= */
+//    RENDER OPTIONS
 
 function renderOptions(options) {
 
@@ -1220,10 +879,7 @@ function renderOptions(options) {
 
 }
 
-
-/* =========================================================
-   SELECT OPTION
-========================================================= */
+//    SELECT OPTION
 
 function selectOption(
     button,
@@ -1281,11 +937,7 @@ function selectOption(
         "";
 
 }
-
-
-/* =========================================================
-   NEXT QUESTION
-========================================================= */
+//    NEXT QUESTION
 
 function nextQuestion() {
 
@@ -1359,10 +1011,7 @@ function nextQuestion() {
 
 }
 
-
-/* =========================================================
-   PREVIOUS QUESTION
-========================================================= */
+//    PREVIOUS QUESTION
 
 function previousQuestion() {
 
@@ -1395,20 +1044,14 @@ function previousQuestion() {
 
 }
 
-
-/* =========================================================
-   UPDATE PROGRESS
-========================================================= */
-
+//    UPDATE PROGRESS
 function updateProgress() {
-
 
     if (!questions.length) {
 
         return;
 
     }
-
 
     const progress =
         (
@@ -1427,10 +1070,7 @@ function updateProgress() {
 
 }
 
-
-/* =========================================================
-   FINISH QUIZ
-========================================================= */
+//    FINISH QUIZ 
 
 async function finishQuiz() {
 

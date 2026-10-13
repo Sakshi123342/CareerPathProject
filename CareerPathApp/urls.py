@@ -25,4 +25,6 @@ urlpatterns = [
    path("job-internship-analysis/",views.job_internship_analysis,name="job_internship_analysis"),
    path("job-internship-analysis-api/",views.job_internship_analysis_api,name="job_internship_analysis_api"),
    path("job-internship-recommendation-api/",views.job_internship_recommendation,name="job_internship_recommendation_api"),
+   path("job-internship-opportunity/",views.job_internship_opportunity,name="job_internship_opportunity"),
+   path("job-internship-opportunity-api/",views.job_internship_opportunity_api,name="job_internship_opportunity_api"),
 ]

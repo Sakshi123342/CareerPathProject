@@ -141,96 +141,81 @@
 
             <!-- ================= CAREER PATH ================= -->
 
+            <!-- ================= CAREER PATH ================= -->
+
             <div class="career-path">
 
                 <h2>
-                    Career Path
+                    Career Path: {{ career.name }}
                 </h2>
 
                 <p>
-                    Start with the required skills, gain practical
-                    experience through projects and continuously
-                    improve your knowledge.
+                    Follow this career-specific pathway to understand
+                    the practical steps needed to enter and grow
+                    in {{ career.name }}.
                 </p>
-
 
                 <div class="path-steps">
 
-                    <div class="path-step">
+                    {% if career.career_path %}
 
-                        <div class="step-number">
-                            1
-                        </div>
-
-                        <h3>
-                            Learn Skills
-                        </h3>
-
-                        <p>
-                            Learn the fundamental skills required
-                            for this career.
-                        </p>
-
-                    </div>
-
+                    {% for stage in career.career_path %}
 
                     <div class="path-step">
 
                         <div class="step-number">
-                            2
+                            {{ forloop.counter }}
                         </div>
 
                         <h3>
-                            Build Projects
+                            {{ stage.title }}
                         </h3>
 
                         <p>
-                            Create practical projects to improve
-                            your knowledge and experience.
+                            {{ stage.objective }}
                         </p>
+
+                        {% if stage.actions %}
+
+                        <ul class="path-actions">
+
+                            {% for action in stage.actions %}
+
+                            <li>
+                                {{ action }}
+                            </li>
+
+                            {% endfor %}
+
+                        </ul>
+
+                        {% endif %}
+
+                        {% if stage.milestone %}
+
+                        <p class="path-milestone">
+                            <strong>Milestone:</strong>
+                            {{ stage.milestone }}
+                        </p>
+
+                        {% endif %}
 
                     </div>
 
+                    {% endfor %}
 
-                    <div class="path-step">
+                    {% else %}
 
-                        <div class="step-number">
-                            3
-                        </div>
+                    <p>
+                        The career-specific pathway is currently
+                        unavailable. Please try again later.
+                    </p>
 
-                        <h3>
-                            Get Experience
-                        </h3>
-
-                        <p>
-                            Gain experience through internships,
-                            freelancing or real-world projects.
-                        </p>
-
-                    </div>
-
-
-                    <div class="path-step">
-
-                        <div class="step-number">
-                            4
-                        </div>
-
-                        <h3>
-                            Start Career
-                        </h3>
-
-                        <p>
-                            Apply for jobs and start your
-                            professional career.
-                        </p>
-
-                    </div>
+                    {% endif %}
 
                 </div>
 
             </div>
-
 
 
             <!-- ================= BOTTOM CTA ================= -->

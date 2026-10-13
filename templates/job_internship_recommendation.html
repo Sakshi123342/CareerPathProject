@@ -1,20 +1,17 @@
+
 {% load static %}
 
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Job & Internship Recommendation</title>
 
     <link rel="stylesheet"
           href="{% static 'css/job_internship_recommendation.css' %}">
-
 </head>
 
 <body>
@@ -22,57 +19,37 @@
 <div class="page-wrapper">
 
     <header class="page-header">
-
         <div class="header-content">
 
-            <p class="header-label">
-                CAREERPATH
-            </p>
+            <p class="header-label">CAREERPATH</p>
 
-            <h1>
-                💼 Job & Internship Recommendation
-            </h1>
+            <h1>💼 Job & Internship Recommendation</h1>
 
             <p class="header-subtitle">
-                Find opportunities based on your career
-                interests, education and skills.
+                Find opportunities based on your career interests,
+                education, skills and experience.
             </p>
 
         </div>
-
     </header>
-
 
     <main class="main-container">
 
         <section class="main-card interest-card">
 
-            <div class="section-icon">
-                🎯
-            </div>
+            <div class="section-icon">🎯</div>
 
-
-            <h2>
-                Tell Us About Your Career Interest
-            </h2>
-
+            <h2>Tell Us About Your Career Profile</h2>
 
             <p class="section-description">
-                Enter your interest, skills and education
-                so we can analyze your profile dynamically.
+                Enter your details to get personalized job
+                and internship recommendations.
             </p>
 
-
             <!-- INTEREST -->
-
-            <label
-                for="interestInput"
-                class="input-label">
-
-                Your Interest / Subject
-
+            <label for="interestInput" class="input-label">
+                Your Interest / Career Field
             </label>
-
 
             <input
                 type="text"
@@ -80,23 +57,13 @@
                 class="interest-input"
                 autocomplete="off">
 
-
-            <div
-                id="interestError"
-                class="error-message">
-            </div>
+            <div id="interestError" class="error-message"></div>
 
 
             <!-- SKILLS -->
-
-            <label
-                for="skillsInput"
-                class="input-label">
-
+            <label for="skillsInput" class="input-label">
                 Your Skills
-
             </label>
-
 
             <input
                 type="text"
@@ -104,23 +71,13 @@
                 class="interest-input"
                 autocomplete="off">
 
-
-            <div
-                id="skillsError"
-                class="error-message">
-            </div>
+            <div id="skillsError" class="error-message"></div>
 
 
             <!-- EDUCATION -->
-
-            <label
-                for="educationInput"
-                class="input-label">
-
+            <label for="educationInput" class="input-label">
                 Your Education
-
             </label>
-
 
             <input
                 type="text"
@@ -128,15 +85,44 @@
                 class="interest-input"
                 autocomplete="off">
 
+            <div id="educationError" class="error-message"></div>
 
-            <div
-                id="educationError"
-                class="error-message">
-            </div>
+
+            <!-- EXPERIENCE LEVEL -->
+            <label for="experienceInput" class="input-label">
+                Your Experience Level
+            </label>
+
+            <select id="experienceInput" class="interest-input">
+
+                <option value="">Select your experience level</option>
+
+                <option value="fresher">
+                    Fresher / Student
+                </option>
+
+                <option value="internship">
+                    Internship Experience Only
+                </option>
+
+                <option value="0-2">
+                    0–2 Years of Professional Experience
+                </option>
+
+                <option value="2-5">
+                    2–5 Years of Professional Experience
+                </option>
+
+                <option value="5+">
+                    5+ Years of Professional Experience
+                </option>
+
+            </select>
+
+            <div id="experienceError" class="error-message"></div>
 
 
             <!-- CONTINUE -->
-
             <div class="button-container">
 
                 <button
@@ -154,15 +140,10 @@
 
 
         <!-- BACK -->
-
         <div class="back-button-container">
 
-            <a
-                href="/#features"
-                class="back-button">
-
+            <a href="/#features" class="back-button">
                 ← Back to Features
-
             </a>
 
         </div>
@@ -174,97 +155,74 @@
 
 <script>
 
-    // =====================================================
-    // ELEMENTS
-    // =====================================================
+    // INPUT ELEMENTS
 
     const interestInput =
-        document.getElementById(
-            "interestInput"
-        );
-
+        document.getElementById("interestInput");
 
     const skillsInput =
-        document.getElementById(
-            "skillsInput"
-        );
-
+        document.getElementById("skillsInput");
 
     const educationInput =
-        document.getElementById(
-            "educationInput"
-        );
+        document.getElementById("educationInput");
+
+    const experienceInput =
+        document.getElementById("experienceInput");
+
+
+    // ERROR ELEMENTS
+
+    const interestError =
+        document.getElementById("interestError");
+
+    const skillsError =
+        document.getElementById("skillsError");
+
+    const educationError =
+        document.getElementById("educationError");
+
+    const experienceError =
+        document.getElementById("experienceError");
 
 
     const continueButton =
-        document.getElementById(
-            "continueButton"
-        );
+        document.getElementById("continueButton");
 
 
-    const interestError =
-        document.getElementById(
-            "interestError"
-        );
-
-
-    const skillsError =
-        document.getElementById(
-            "skillsError"
-        );
-
-
-    const educationError =
-        document.getElementById(
-            "educationError"
-        );
-
-
-    // =====================================================
     // CONTINUE TO ANALYSIS
-    // =====================================================
 
     function continueToAnalysis() {
 
-        const interest =
-            interestInput.value.trim();
+        const interest = interestInput.value.trim();
+
+        const skills = skillsInput.value.trim();
+
+        const education = educationInput.value.trim();
+
+        const experience = experienceInput.value.trim();
 
 
-        const skills =
-            skillsInput.value.trim();
-
-
-        const education =
-            educationInput.value.trim();
-
-
-        // Clear old errors
+        // CLEAR PREVIOUS ERRORS
 
         interestError.textContent = "";
-
         skillsError.textContent = "";
-
         educationError.textContent = "";
+        experienceError.textContent = "";
 
 
-        // =================================================
-        // INTEREST VALIDATION
-        // =================================================
+        // VALIDATE INTEREST
 
         if (!interest) {
 
             interestError.textContent =
-                "Please enter your interest or subject.";
+                "Please enter your interest or career field.";
 
             interestInput.focus();
-
             return;
         }
 
 
-        // =================================================
-        // SKILLS VALIDATION
-        // =================================================
+        // VALIDATE SKILLS
 
         if (!skills) {
 
@@ -272,14 +230,11 @@
                 "Please enter your skills.";
 
             skillsInput.focus();
-
             return;
         }
 
 
-        // =================================================
-        // EDUCATION VALIDATION
-        // =================================================
+        // VALIDATE EDUCATION
 
         if (!education) {
 
@@ -287,55 +242,60 @@
                 "Please enter your education.";
 
             educationInput.focus();
-
             return;
         }
 
 
-        // =================================================
-        // STORE ACTUAL USER INPUT
-        // =================================================
+        // VALIDATE EXPERIENCE LEVEL
+
+        if (!experience) {
+
+            experienceError.textContent =
+                "Please select your experience level.";
+
+            experienceInput.focus();
+            return;
+        }
+
+
+        // SAVE USER INPUTS
 
         sessionStorage.setItem(
             "job_internship_interest",
             interest
         );
 
-
         sessionStorage.setItem(
             "job_internship_skills",
             skills
         );
-
 
         sessionStorage.setItem(
             "job_internship_education",
             education
         );
 
+        sessionStorage.setItem(
+            "job_internship_experience",
+            experience
+        );
 
-        // =================================================
-        // GO TO ANALYSIS PAGE
-        // =================================================
+
+        // REDIRECT TO ANALYSIS PAGE
 
         const analysisURL =
             "{% url 'job_internship_analysis' %}" +
-            "?interest=" +
-            encodeURIComponent(interest) +
-            "&skills=" +
-            encodeURIComponent(skills) +
-            "&education=" +
-            encodeURIComponent(education);
+            "?interest=" + encodeURIComponent(interest) +
+            "&skills=" + encodeURIComponent(skills) +
+            "&education=" + encodeURIComponent(education) +
+            "&experience=" + encodeURIComponent(experience);
 
+        window.location.href = analysisURL;
 
-        window.location.href =
-            analysisURL;
     }
 
 
-    // =====================================================
-    // BUTTON
-    // =====================================================
+    // CONTINUE BUTTON
 
     continueButton.addEventListener(
         "click",
@@ -343,99 +303,66 @@
     );
 
 
-    // =====================================================
-    // ENTER KEY
-    // =====================================================
+    // ENTER KEY FOR TEXT INPUTS
 
-    interestInput.addEventListener(
-        "keydown",
-        function(event) {
+    [
+        interestInput,
+        skillsInput,
+        educationInput
+    ].forEach(function(input) {
 
-            if (event.key === "Enter") {
-
-                event.preventDefault();
-
-                continueToAnalysis();
-            }
-
-        }
-    );
-
-
-    skillsInput.addEventListener(
-        "keydown",
-        function(event) {
+        input.addEventListener("keydown", function(event) {
 
             if (event.key === "Enter") {
 
                 event.preventDefault();
-
                 continueToAnalysis();
+
             }
 
+        });
+
+    });
+
+
+    // CLEAR ERRORS WHILE TYPING
+
+    interestInput.addEventListener("input", function() {
+
+        if (interestInput.value.trim()) {
+            interestError.textContent = "";
         }
-    );
+
+    });
 
 
-    educationInput.addEventListener(
-        "keydown",
-        function(event) {
+    skillsInput.addEventListener("input", function() {
 
-            if (event.key === "Enter") {
-
-                event.preventDefault();
-
-                continueToAnalysis();
-            }
-
+        if (skillsInput.value.trim()) {
+            skillsError.textContent = "";
         }
-    );
+
+    });
 
 
-    // =====================================================
-    // REMOVE ERROR WHILE TYPING
-    // =====================================================
+    educationInput.addEventListener("input", function() {
 
-    interestInput.addEventListener(
-        "input",
-        function() {
-
-            if (interestInput.value.trim()) {
-
-                interestError.textContent = "";
-            }
-
+        if (educationInput.value.trim()) {
+            educationError.textContent = "";
         }
-    );
+
+    });
 
 
-    skillsInput.addEventListener(
-        "input",
-        function() {
+    experienceInput.addEventListener("change", function() {
 
-            if (skillsInput.value.trim()) {
-
-                skillsError.textContent = "";
-            }
-
+        if (experienceInput.value) {
+            experienceError.textContent = "";
         }
-    );
 
-
-    educationInput.addEventListener(
-        "input",
-        function() {
-
-            if (educationInput.value.trim()) {
-
-                educationError.textContent = "";
-            }
-
-        }
-    );
+    });
 
 </script>
 
 </body>
-
 </html>
